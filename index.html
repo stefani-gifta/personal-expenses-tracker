@@ -9,17 +9,34 @@
 
         * { box-sizing: border-box; }
 
+        html, body {
+            height: 100%;
+        }
+
         body {
             font-family: 'Space Mono', monospace;
             background: #EAE4F5;
             color: #2B2438;
             max-width: 400px;
+            width: 100%;
             margin: 40px auto;
             padding: 32px;
             border-radius: 16px;
-            background-image: #F3EFFA;
+            background-color: #FFFFFF;
             box-shadow: 0 4px 24px rgba(124, 92, 191, 0.12);
             border: 1px solid #E4DBF5;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                margin: 0 auto;
+                min-height: 100%;
+                max-width: 100%;
+                border-radius: 0;
+                border: none;
+                padding: 24px 20px;
+                box-shadow: none;
+            }
         }
 
         h2 {
@@ -48,15 +65,17 @@
 
         select, input {
             width: 100%;
-            padding: 10px 12px;
+            padding: 12px;
             margin-top: 2px;
             font-family: 'Space Mono', monospace;
-            font-size: 14px;
+            font-size: 16px;
             color: #2B2438;
-            background: #FFFFFF;
+            background: #F3EFFA;
             border: 1.5px solid #E4DBF5;
             border-radius: 8px;
             transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            -webkit-appearance: none;
+              appearance: none;
         }
 
         select:focus, input:focus {
@@ -190,6 +209,7 @@
             font-size: 13px;
             font-style: italic;
             min-height: 16px;
+            font-family: 'Space Mono', monospace;
         }
     </style>
 </head>
