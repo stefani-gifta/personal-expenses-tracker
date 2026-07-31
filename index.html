@@ -62,6 +62,12 @@
         </select>
     </div>
 
+    <!-- Transaction Date -->
+    <div class="form-group">
+        <label for="transactionDate">Date</label>
+        <input type="date" id="transactionDate" required>
+    </div>
+
     <!-- Amount -->
     <div class="form-group">
         <label for="amount">Amount</label>
@@ -79,6 +85,7 @@
 
     <!-- Submit Button -->
     <button id="submitBtn" onclick="sendTransaction()" disabled>Loading Sheet Configuration...</button>
+    <button type="button" id="resetBtn" onclick="resetTransactionForm()">Reset</button>
 
     <!-- Success / Failure Output -->
     <div id="status"></div>
@@ -98,6 +105,22 @@
                 ? `Rp${new Intl.NumberFormat("id-ID").format(amount)}`
                 : "Balance unavailable";
         }
+
+        function getToday() {
+            const today = new Date();
+            const month = String(today.getMonth() + 1).padStart(2, "0");
+            const day = String(today.getDate()).padStart(2, "0");
+            return `${today.getFullYear()}-${month}-${day}`;
+        }
+
+        function resetTransactionForm() {
+            document.getElementById("transactionDate").value = getToday();
+            document.getElementById("amount").value = "";
+            document.getElementById("note").value = "";
+            document.getElementById("status").style.display = "none";
+        }
+
+        resetTransactionForm();
 
         // 1. LOAD CATEGORIES AFTER AUTHENTICATION
         async function loadApp() {
@@ -192,6 +215,7 @@
 
             const payload = {
                 apiKey,
+                date: document.getElementById("transactionDate").value,
                 type: document.getElementById("type").value,
                 wallet: document.getElementById("wallet").value,
                 note: document.getElementById("note").value,
@@ -203,6 +227,11 @@
                     document.getElementById("expenseCategory").value;
             }
 
+
+            if (!payload.date) {
+                alert("Please select a date.");
+                return;
+            }
 
             if (!payload.amount || payload.amount <= 0) {
                 alert("Please enter a valid amount.");
