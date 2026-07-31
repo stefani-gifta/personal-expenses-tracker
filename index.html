@@ -9,17 +9,13 @@
 
         * { box-sizing: border-box; }
 
-        html, body {
-            height: 100%;
-        }
-
         body {
             font-family: 'Space Mono', monospace;
             background: #EAE4F5;
             color: #2B2438;
             max-width: 400px;
             width: 100%;
-            margin: 40px auto;
+            margin: 50vh auto;
             padding: 32px;
             border-radius: 16px;
             background-color: #FFFFFF;
@@ -198,6 +194,7 @@
         #app { display: none; }
 
         #authError {
+            display: none;
             color: #B0233F;
             margin-top: 10px;
             font-size: 13px;
@@ -379,6 +376,7 @@
             } catch (error) {
                 console.error("Initialization error:", error);
                 authError.innerText = error.message;
+                authError.style.display = "block";
                 apiKey = "";
                 document.getElementById("apiKey").value = "";
             } finally {
