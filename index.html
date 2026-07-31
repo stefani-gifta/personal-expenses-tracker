@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Wallet Tracker</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 400px; margin: 40px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        select, input, button { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; }
+        button { background-color: #28a745; color: white; border: none; font-size: 16px; cursor: pointer; border-radius: 4px; }
+        button:disabled { background-color: #cccccc; }
+        #status { margin-top: 20px; padding: 10px; border-radius: 4px; display: none; font-weight: bold; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        #balanceDisplay { font-size: 18px; margin-top: 20px; font-weight: bold; text-align: center; color: #0056b3; }
+        .loading-text { color: #888; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <h2>Wallet Tracker</h2>
+
+    <!-- Dynamic Type Selection -->
+    <div class="form-group">
+        <label for="type">Transaction Type</label>
+        <select id="type">
+            <option class="loading-text">Loading types...</option>
+        </select>
+    </div>
+
+    <!-- Dynamic Expense Category Selection -->
+    <div class="form-group">
+        <label for="expenseCategory">Category</label>
+        <select id="expenseCategory">
+            <option>Loading...</option>
+        </select>
+    </div>
+
+    <!-- Dynamic Wallet Selection -->
+    <div class="form-group">
+        <label for="wallet">Wallet Source / Destination</label>
+        <select id="wallet">
+            <option class="loading-text">Loading wallets...</option>
+        </select>
+    </div>
+
+    <!-- Amount -->
+    <div class="form-group">
+        <label for="amount">Amount</label>
+        <input type="number" id="amount" placeholder="0.00" min="0.01" step="0.01" required>
+    </div>
+
+    <!-- Note (Description) -->
+    <div class="form-group">
+        <label for="note">Note</label>
+        <input
+            type="text"
+            id="note"
+            placeholder="Optional note">
+    </div>
+
+    <!-- Submit Button -->
+    <button id="submitBtn" onclick="sendTransaction()" disabled>Loading Sheet Configuration...</button>
+
+    <!-- Success / Failure Output -->
+    <div id="status"></div>
+
+    <!-- Wallet Balance Output -->
+    <div id="balanceDisplay">Current Balance: Fetching...</div>
+
+    <script>
+        // Replace with your copied Google Apps Script Web App URL
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbyTa1lJVgc6OvhmE_28S5_WIsRrecAth1miXUbqonDM6sH3B_fX94IiXge9QIAhImFgXw/exec"; 
+
+        // 1. LOAD CATEGORIES ON PAGE OPEN
+        window.onload = async function() {
+            try {
+                const response = await fetch(webAppUrl);
+                const data = await response.json();
+                
+                if (data.error) throw new Error(data.error);
+
+                // Populate Type Dropdown
+                const typeSelect = document.getElementById("type");
+                typeSelect.innerHTML = "";
+                data.types.forEach(t => {
+                    typeSelect.options[typeSelect.options.length] = new Option(t, t);
+                });
+
+                const categoryGroup =
+                    document.getElementById("expenseCategory").parentElement;
+
+                function updateCategoryVisibility() {
+                    if (typeSelect.value === "Allowances") {
+                        categoryGroup.style.display = "none";
+                    } else {
+                        categoryGroup.style.display = "block";
+                                
+                        // Populate Expense Category Dropdown
+                        const categorySelect = document.getElementById("expenseCategory");
+                        categorySelect.innerHTML = "";
+
+                        data.expenseCategory.forEach(c => {
+                            categorySelect.options.add(new Option(c, c));
+                        });
+                    }
+                }
+
+                typeSelect.addEventListener("change", updateCategoryVisibility);
+                updateCategoryVisibility();
+
+                // Populate Wallet Dropdown
+                const walletSelect = document.getElementById("wallet");
+                walletSelect.innerHTML = "";
+                data.wallets.forEach(w => {
+                    walletSelect.options[walletSelect.options.length] = new Option(w, w);
+                });
+
+                // Set initial balance display
+                document.getElementById("balanceDisplay").innerText = `Current Balance: $${data.balance}`;
+                
+                // Enable Submit Button
+                const submitBtn = document.getElementById("submitBtn");
+                submitBtn.innerText = "Submit Transaction";
+                submitBtn.disabled = false;
+
+            } catch (error) {
+                console.error("Initialization error:", error);
+                document.getElementById("balanceDisplay").innerText = "Failed to load sheet context.";
+            }
+        };
+
+        // 2. SEND THE TRANSACTION
+        async function sendTransaction() {
+            const submitBtn = document.getElementById("submitBtn");
+const statusDiv = document.getElementById("status");
+            const balanceDisplay = document.getElementById("balanceDisplay");
+
+            const payload = {
+                type: document.getElementById("type").value,
+                wallet: document.getElementById("wallet").value,
+                note: document.getElementById("note").value,
+                amount: Number(document.getElementById("amount").value)
+            };
+
+            if (payload.type === "Expenses") {
+                payload.expenseCategory =
+                    document.getElementById("expenseCategory").value;
+            }
+
+
+            if (!payload.amount || payload.amount <= 0) {
+                alert("Please enter a valid amount.");
+                return;
+            }
+
+            submitBtn.disabled = true;
+            statusDiv.style.display = "none";
+
+            try {
+                const response = await fetch(webAppUrl, {
+                    method: "POST",
+                    mode: "cors",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+
+                if (result.status === "success") {
+                    statusDiv.className = "status success";
+                    statusDiv.innerText = "Transaction updated successfully!";
+                    balanceDisplay.innerText = `Current Balance: $${result.balance}`;
+                    document.getElementById("amount").value = "";
+                    document.getElementById("note").value = "";
+                } else {
+                    throw new Error(result.message || "Failed to save data.");
+                }
+            } catch (error) {
+                statusDiv.className = "status error";
+                statusDiv.innerText = "Error: " + error.message;
+            } finally {
+                statusDiv.style.display = "block";
+                submitBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
