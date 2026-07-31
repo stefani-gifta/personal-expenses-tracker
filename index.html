@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Wallet Tracker</title>
+    <title>Gifta's Expenses Tracker</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
 
@@ -39,17 +39,6 @@
             }
         }
 
-        h2 {
-            font-family: 'Space Mono', monospace;
-            font-weight: 700;
-            font-size: 20px;
-            letter-spacing: 0.02em;
-            color: #4C1D95;
-            margin: 0 0 24px 0;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #EDE7F6;
-        }
-
         .form-group { margin-bottom: 18px; }
 
         label {
@@ -69,13 +58,14 @@
             margin-top: 2px;
             font-family: 'Space Mono', monospace;
             font-size: 16px;
+            text-align: left;
             color: #2B2438;
-            background: #F3EFFA;
+            background: #f4f2f7;
             border: 1.5px solid #E4DBF5;
             border-radius: 8px;
             transition: border-color 0.15s ease, box-shadow 0.15s ease;
             -webkit-appearance: none;
-              appearance: none;
+            appearance: none;
         }
 
         select:focus, input:focus {
@@ -124,7 +114,7 @@
         }
 
         #resetBtn:hover {
-            background-color: #F3EFFA;
+            background-color: #f4f2f7;
             border-color: #7C5CBF;
         }
 
@@ -156,7 +146,7 @@
         }
 
         .loading {
-            background-color: #F3EFFA;
+            background-color: #f4f2f7;
             color: #7C5CBF;
             border: 1px solid #E4DBF5;
             display: flex !important;
@@ -216,7 +206,6 @@
 <body>
 
     <section id="authGate">
-        <h2>Wallet Tracker</h2>
         <form id="authForm">
             <div class="form-group">
                 <label for="apiKey">Password</label>
@@ -228,7 +217,6 @@
     </section>
 
     <main id="app">
-    <h2>Wallet Tracker</h2>
 
     <!-- Dynamic Type Selection -->
     <div class="form-group">
@@ -275,15 +263,16 @@
             placeholder="Description" required>
     </div>
 
-    <!-- Submit Button -->
-    <button id="submitBtn" onclick="sendTransaction()" disabled>Loading Sheet Configuration...</button>
-    <button type="button" id="resetBtn" onclick="resetTransactionForm()">Reset</button>
-
     <!-- Success / Failure Output -->
     <div id="status"></div>
 
     <!-- Wallet Balance Output -->
     <div id="balanceDisplay">Current Balance: Fetching...</div>
+
+    <!-- Submit Button -->
+    <button id="submitBtn" onclick="sendTransaction()" disabled>Loading Sheet Configuration...</button>
+    <button type="button" id="resetBtn" onclick="resetTransactionForm()">Reset</button>
+    
     </main>
 
     <script>
