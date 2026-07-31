@@ -15,7 +15,8 @@
             color: #2B2438;
             max-width: 400px;
             width: 100%;
-            margin: 50vh auto;
+            min-height: 100vh;
+            margin: 0 auto;
             padding: 32px;
             border-radius: 16px;
             background-color: #FFFFFF;
@@ -26,7 +27,7 @@
         @media (max-width: 480px) {
             body {
                 margin: 0 auto;
-                min-height: 100%;
+                min-height: 100vh;
                 max-width: 100%;
                 border-radius: 0;
                 border: none;
@@ -135,47 +136,6 @@
             to { transform: rotate(360deg); }
         }
 
-        #status {
-            margin-top: 20px;
-            padding: 12px;
-            border-radius: 8px;
-            display: none;
-            font-family: 'Space Mono', monospace;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .loading {
-            background-color: #f4f2f7;
-            color: #7C5CBF;
-            border: 1px solid #E4DBF5;
-            display: flex !important;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .loading .dot-spinner {
-            width: 14px;
-            height: 14px;
-            border: 2px solid #E4DBF5;
-            border-top-color: #7C5CBF;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            flex-shrink: 0;
-        }
-
-        .success {
-            background-color: #E9F7EF;
-            color: #1E7A45;
-            border: 1px solid #C3E9D3;
-        }
-
-        .error {
-            background-color: #FCE9EC;
-            color: #B0233F;
-            border: 1px solid #F3C6CF;
-        }
-
         #balanceDisplay {
             font-family: 'Space Mono', monospace;
             font-size: 16px;
@@ -190,6 +150,11 @@
         }
 
         .loading-text { color: #9C93B3; font-style: italic; }
+
+        #authGate,
+        #app {
+            width: 100%;
+        }
 
         #app { display: none; }
 
@@ -264,9 +229,6 @@
             placeholder="Description" required>
     </div>
 
-    <!-- Success / Failure Output -->
-    <div id="status"></div>
-
     <!-- Wallet Balance Output -->
     <div id="balanceDisplay">Current Balance: Fetching...</div>
 
@@ -299,7 +261,6 @@
             document.getElementById("transactionDate").value = getToday();
             document.getElementById("amount").value = "";
             document.getElementById("note").value = "";
-            document.getElementById("status").style.display = "none";
             document.getElementById("balanceDisplay").style.display = "none";
         }
 
@@ -394,7 +355,6 @@
         // 2. SEND THE TRANSACTION
         async function sendTransaction() {
             const submitBtn = document.getElementById("submitBtn");
-            const statusDiv = document.getElementById("status");
             const balanceDisplay = document.getElementById("balanceDisplay");
 
             const payload = {
@@ -425,9 +385,6 @@
             const originalLabel = submitBtn.innerText;
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="btn-spinner"></span>Saving...';
-            statusDiv.className = "loading";
-            statusDiv.innerHTML = '<span class="dot-spinner"></span>Sending data ...';
-            statusDiv.style.display = "flex";
 
             try {
                 const response = await fetch(webAppUrl, {
@@ -440,8 +397,6 @@
                 const result = await response.json();
 
                 if (result.status === "success") {
-                    statusDiv.className = "success";
-                    statusDiv.innerText = "Transaction updated successfully!";
                     balanceDisplay.style.display = "block";
                     balanceDisplay.innerText =
                         `Current Balance: ${formatBalance(result.balance)}`;
@@ -451,10 +406,8 @@
                     throw new Error(result.message || "Failed to save data.");
                 }
             } catch (error) {
-                statusDiv.className = "error";
-                statusDiv.innerText = "Error: " + error.message;
+                alert("Error: " + error.message);
             } finally {
-                statusDiv.style.display = "block";
                 submitBtn.disabled = false;
                 submitBtn.innerText = originalLabel;
             }
