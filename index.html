@@ -9,8 +9,8 @@
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
         select, input, button { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; }
-        button { background-color: #28a745; color: white; border: none; font-size: 16px; cursor: pointer; border-radius: 4px; }
         button:disabled { background-color: #cccccc; }
+        #submitBtn { background-color: #28a745; color: white; border: none; font-size: 16px; cursor: pointer; border-radius: 4px; }
         #status { margin-top: 20px; padding: 10px; border-radius: 4px; display: none; font-weight: bold; }
         .loading { background-color: #909b93; color: #3a473d; border: 1px solid #c5c6c5; }
         .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
@@ -46,6 +46,12 @@
         </select>
     </div>
 
+    <!-- Transaction Date -->
+    <div class="form-group">
+        <label for="transactionDate">Date</label>
+        <input type="date" id="transactionDate" required>
+    </div>
+
     <!-- Dynamic Expense Category Selection -->
     <div class="form-group">
         <label for="expenseCategory">Category</label>
@@ -60,12 +66,6 @@
         <select id="wallet">
             <option class="loading-text">Loading wallets...</option>
         </select>
-    </div>
-
-    <!-- Transaction Date -->
-    <div class="form-group">
-        <label for="transactionDate">Date</label>
-        <input type="date" id="transactionDate" required>
     </div>
 
     <!-- Amount -->
@@ -118,6 +118,7 @@
             document.getElementById("amount").value = "";
             document.getElementById("note").value = "";
             document.getElementById("status").style.display = "none";
+            document.getElementById("balanceDisplay").style.display = "none";
         }
 
         resetTransactionForm();
