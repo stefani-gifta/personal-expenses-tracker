@@ -92,6 +92,13 @@
         const webAppUrl = "WEB_APP_URL";
         let apiKey = "";
 
+        function formatBalance(value) {
+            const amount = Number(value);
+            return Number.isFinite(amount)
+                ? `Rp${new Intl.NumberFormat("id-ID").format(amount)}`
+                : "Balance unavailable";
+        }
+
         // 1. LOAD CATEGORIES AFTER AUTHENTICATION
         async function loadApp() {
             const authGate = document.getElementById("authGate");
@@ -152,7 +159,8 @@
                 });
 
                 // Set initial balance display
-                document.getElementById("balanceDisplay").innerText = `Current Balance: Rp${data.balance}.mask('000.000.000', {reverse: true})`;
+                document.getElementById("balanceDisplay").innerText =
+                    `Current Balance: ${formatBalance(data.balance)}`;
                 
                 // Enable Submit Button
                 const submitBtn = document.getElementById("submitBtn");
@@ -202,7 +210,9 @@
             }
 
             submitBtn.disabled = true;
-            statusDiv.style.display = "none";
+            statusDiv.className = "status loading";
+            statusDiv.innerText = "Sending data ...";
+            statusDiv.style.display = "block";
 
             try {
                 const response = await fetch(webAppUrl, {
@@ -213,13 +223,12 @@
                 });
                 
                 const result = await response.json();
-                statusDiv.className = "status loading";
-                statusDiv.innerText = "Sending data ...";
 
                 if (result.status === "success") {
                     statusDiv.className = "status success";
                     statusDiv.innerText = "Transaction updated successfully!";
-                    balanceDisplay.innerText = `Current Balance: Rp${result.balance}.mask('000.000.000', {reverse: true})`;
+                    balanceDisplay.innerText =
+                        `Current Balance: ${formatBalance(result.balance)}`;
                     document.getElementById("amount").value = "";
                     document.getElementById("note").value = "";
                 } else {
