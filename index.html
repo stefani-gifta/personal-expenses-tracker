@@ -5,20 +5,192 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Wallet Tracker</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 400px; margin: 40px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        select, input, button { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; }
-        button:disabled { background-color: #cccccc; }
-        #submitBtn { background-color: #28a745; color: white; border: none; font-size: 16px; cursor: pointer; border-radius: 4px; }
-        #status { margin-top: 20px; padding: 10px; border-radius: 4px; display: none; font-weight: bold; }
-        .loading { background-color: #909b93; color: #3a473d; border: 1px solid #c5c6c5; }
-        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        #balanceDisplay { font-size: 18px; margin-top: 20px; display: none; font-weight: bold; text-align: center; color: #0056b3; }
-        .loading-text { color: #888; font-style: italic; }
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Space Mono', monospace;
+            background: #EAE4F5;
+            color: #2B2438;
+            max-width: 400px;
+            margin: 40px auto;
+            padding: 32px;
+            border-radius: 16px;
+            background-image: #F3EFFA;
+            box-shadow: 0 4px 24px rgba(124, 92, 191, 0.12);
+            border: 1px solid #E4DBF5;
+        }
+
+        h2 {
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            font-size: 20px;
+            letter-spacing: 0.02em;
+            color: #4C1D95;
+            margin: 0 0 24px 0;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #EDE7F6;
+        }
+
+        .form-group { margin-bottom: 18px; }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #7C5CBF;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 10px 12px;
+            margin-top: 2px;
+            font-family: 'Space Mono', monospace;
+            font-size: 14px;
+            color: #2B2438;
+            background: #FFFFFF;
+            border: 1.5px solid #E4DBF5;
+            border-radius: 8px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #7C5CBF;
+            box-shadow: 0 0 0 3px rgba(124, 92, 191, 0.15);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            font-family: 'Space Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            transition: background-color 0.15s ease, transform 0.1s ease;
+        }
+
+        button:active { transform: scale(0.98); }
+
+        button:disabled {
+            background-color: #D8D2E6 !important;
+            color: #9C93B3 !important;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #submitBtn, #authButton {
+            background-color: #7C5CBF;
+            color: #FFFFFF;
+        }
+
+        #submitBtn:hover:not(:disabled), #authButton:hover:not(:disabled) {
+            background-color: #5B21B6;
+        }
+
+        #resetBtn {
+            background-color: transparent;
+            color: #7C5CBF;
+            border: 1.5px solid #E4DBF5;
+        }
+
+        #resetBtn:hover {
+            background-color: #F3EFFA;
+            border-color: #7C5CBF;
+        }
+
+        /* Spinner shown inline inside a button's own label while busy */
+        .btn-spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-top-color: #FFFFFF;
+            border-radius: 50%;
+            vertical-align: middle;
+            margin-right: 8px;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        #status {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            display: none;
+            font-family: 'Space Mono', monospace;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .loading {
+            background-color: #F3EFFA;
+            color: #7C5CBF;
+            border: 1px solid #E4DBF5;
+            display: flex !important;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .loading .dot-spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid #E4DBF5;
+            border-top-color: #7C5CBF;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            flex-shrink: 0;
+        }
+
+        .success {
+            background-color: #E9F7EF;
+            color: #1E7A45;
+            border: 1px solid #C3E9D3;
+        }
+
+        .error {
+            background-color: #FCE9EC;
+            color: #B0233F;
+            border: 1px solid #F3C6CF;
+        }
+
+        #balanceDisplay {
+            font-family: 'Space Mono', monospace;
+            font-size: 16px;
+            margin-top: 24px;
+            display: none;
+            font-weight: 700;
+            text-align: center;
+            color: #4C1D95;
+            padding: 14px;
+            background: #EDE7F6;
+            border-radius: 8px;
+        }
+
+        .loading-text { color: #9C93B3; font-style: italic; }
+
         #app { display: none; }
-        #authError { color: #721c24; margin-top: 10px; }
+
+        #authError {
+            color: #B0233F;
+            margin-top: 10px;
+            font-size: 13px;
+            font-style: italic;
+            min-height: 16px;
+        }
     </style>
 </head>
 <body>
@@ -131,7 +303,7 @@
             const authButton = document.getElementById("authButton");
 
             authButton.disabled = true;
-            authButton.innerText = "Checking...";
+            authButton.innerHTML = '<span class="btn-spinner"></span>Checking...';
             authError.innerText = "";
 
             try {
@@ -239,10 +411,12 @@
                 return;
             }
 
+            const originalLabel = submitBtn.innerText;
             submitBtn.disabled = true;
-            statusDiv.className = "status loading";
-            statusDiv.innerText = "Sending data ...";
-            statusDiv.style.display = "block";
+            submitBtn.innerHTML = '<span class="btn-spinner"></span>Saving...';
+            statusDiv.className = "loading";
+            statusDiv.innerHTML = '<span class="dot-spinner"></span>Sending data ...';
+            statusDiv.style.display = "flex";
 
             try {
                 const response = await fetch(webAppUrl, {
@@ -255,7 +429,7 @@
                 const result = await response.json();
 
                 if (result.status === "success") {
-                    statusDiv.className = "status success";
+                    statusDiv.className = "success";
                     statusDiv.innerText = "Transaction updated successfully!";
                     balanceDisplay.style.display = "block";
                     balanceDisplay.innerText =
@@ -266,11 +440,12 @@
                     throw new Error(result.message || "Failed to save data.");
                 }
             } catch (error) {
-                statusDiv.className = "status error";
+                statusDiv.className = "error";
                 statusDiv.innerText = "Error: " + error.message;
             } finally {
                 statusDiv.style.display = "block";
                 submitBtn.disabled = false;
+                submitBtn.innerText = originalLabel;
             }
         }
     </script>
