@@ -34,8 +34,28 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Inject Secret into HTML
+        env:
+          WEB_APP_URL: ${{ secrets.WEB_APP_URL }}
         run: |
-          sed -i 's/WEB_APP_URL/${{ secrets.WEB_APP_URL }}/g' index.html
+          node <<'NODE'
+          const fs = require('fs');
+          const filePath = 'index.html';
+          const WEB_APP_URL = process.env.WEB_APP_URL;
+
+          if (!WEB_APP_URL) {
+            throw new Error('The WEB_APP_URL repository secret is not set.');
+          }
+
+          const html = fs.readFileSync(filePath, 'utf8');
+          if (!html.includes('"WEB_APP_URL"')) {
+            throw new Error('The WEB_APP_URL placeholder was not found in index.html.');
+          }
+
+          fs.writeFileSync(
+            filePath,
+            html.replaceAll('"WEB_APP_URL"', JSON.stringify(WEB_APP_URL))
+          );
+          NODE
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
