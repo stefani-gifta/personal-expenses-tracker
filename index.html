@@ -317,6 +317,9 @@
                         // Populate Expense Category Dropdown
                         const categorySelect = document.getElementById("expenseCategory");
                         categorySelect.innerHTML = "";
+                        
+                        // Add blank option
+                        categorySelect.options.add(new Option("Unselected", ""));
 
                         data.expenseCategory.forEach(c => {
                             categorySelect.options.add(new Option(c, c));
@@ -330,6 +333,10 @@
                 // Populate Wallet Dropdown
                 const walletSelect = document.getElementById("wallet");
                 walletSelect.innerHTML = "";
+                
+                // Add blank option
+                walletSelect.options.add(new Option("Unselected", ""));
+                
                 data.wallets.forEach(w => {
                     walletSelect.options[walletSelect.options.length] = new Option(w, w);
                 });
