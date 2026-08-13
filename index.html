@@ -58,7 +58,7 @@
             color: #7C5CBF;
         }
 
-        select, input {
+        select, input, datalist {
             width: 100%;
             padding: 12px;
             margin-top: 2px;
@@ -72,6 +72,12 @@
             transition: border-color 0.15s ease, box-shadow 0.15s ease;
             -webkit-appearance: none;
             appearance: none;
+        }
+
+        datalist option {
+            color: #2B2438;
+            background: #f4f2f7;
+            padding: 8px 12px;
         }
 
         select:focus, input:focus {
@@ -214,9 +220,8 @@
     <!-- Dynamic Expense Category Selection -->
     <div class="form-group">
         <label for="expenseCategory">Category</label>
-        <select id="expenseCategory">
-            <option>Loading...</option>
-        </select>
+        <input type="text" id="expenseCategory" list="categoryList" placeholder="Type or select...">
+        <datalist id="categoryList"></datalist>
     </div>
 
     <!-- Dynamic Wallet Selection -->
@@ -318,15 +323,21 @@
                     } else {
                         categoryGroup.style.display = "block";
                                 
-                        // Populate Expense Category Dropdown
-                        const categorySelect = document.getElementById("expenseCategory");
-                        categorySelect.innerHTML = "";
+                        // Populate Expense Category Datalist
+                        const categoryList = document.getElementById("categoryList");
+                        categoryList.innerHTML = "";
                         
                         // Add blank option
-                        categorySelect.options.add(new Option("Unselected", ""));
+                        const blankOption = document.createElement("option");
+                        blankOption.value = "";
+                        blankOption.text = "Unselected";
+                        categoryList.appendChild(blankOption);
 
                         data.expenseCategory.forEach(c => {
-                            categorySelect.options.add(new Option(c, c));
+                            const option = document.createElement("option");
+                            option.value = c;
+                            option.text = c;
+                            categoryList.appendChild(option);
                         });
                     }
                 }
