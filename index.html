@@ -227,9 +227,8 @@
     <!-- Dynamic Wallet Selection -->
     <div class="form-group">
         <label for="wallet">Wallet Source / Destination</label>
-        <select id="wallet">
-            <option class="loading-text">Loading wallets...</option>
-        </select>
+        <input type="text" id="wallet" list="walletList" placeholder="Type or select...">
+        <datalist id="walletList"></datalist>
     </div>
 
     <!-- Amount -->
@@ -345,15 +344,21 @@
                 typeSelect.addEventListener("change", updateCategoryVisibility);
                 updateCategoryVisibility();
 
-                // Populate Wallet Dropdown
-                const walletSelect = document.getElementById("wallet");
-                walletSelect.innerHTML = "";
+                // Populate Wallet Datalist
+                const walletList = document.getElementById("walletList");
+                walletList.innerHTML = "";
                 
                 // Add blank option
-                walletSelect.options.add(new Option("Unselected", ""));
+                const blankWalletOption = document.createElement("option");
+                blankWalletOption.value = "";
+                blankWalletOption.text = "Unselected";
+                walletList.appendChild(blankWalletOption);
                 
                 data.wallets.forEach(w => {
-                    walletSelect.options[walletSelect.options.length] = new Option(w, w);
+                    const option = document.createElement("option");
+                    option.value = w;
+                    option.text = w;
+                    walletList.appendChild(option);
                 });
 
                 // Set initial balance display
