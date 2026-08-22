@@ -94,6 +94,19 @@
             font-size: 90%;
         }
 
+        .date-input-wrapper {
+            position: relative;
+        }
+
+        #transactionDateValue {
+            position: absolute;
+            inset: 2px 0 0;
+            width: 100%;
+            height: calc(100% - 2px);
+            opacity: 0;
+            pointer-events: none;
+        }
+
         button {
             width: 100%;
             padding: 12px;
@@ -261,8 +274,10 @@
     <!-- Transaction Date -->
     <div class="form-group">
         <label for="transactionDate">Date</label>
-        <input type="text" id="transactionDate" placeholder="dd MMM yyyy" autocomplete="off" required>
-        <input type="date" id="transactionDateValue" hidden>
+        <div class="date-input-wrapper">
+            <input type="text" id="transactionDate" placeholder="dd MMM yyyy" autocomplete="off" readonly required>
+            <input type="date" id="transactionDateValue" aria-label="Choose transaction date">
+        </div>
     </div>
 
     <!-- Dynamic Expense Category Selection -->
@@ -343,24 +358,6 @@
         function setTransactionDate(isoDate) {
             document.getElementById("transactionDateValue").value = isoDate;
             document.getElementById("transactionDate").value = formatDateForDisplay(isoDate);
-        }
-
-        function parseDisplayDate(value) {
-            const match = value.trim().match(/^(\d{2}) ([A-Za-z]{3}) (\d{4})$/);
-            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            const month = match ? monthNames.indexOf(match[2]) : -1;
-
-            if (!match || month < 0) {
-                return "";
-            }
-
-            const day = Number(match[1]);
-            const year = Number(match[3]);
-            const date = new Date(year, month, day);
-
-            return date.getFullYear() === year && date.getMonth() === month && date.getDate() === day
-                ? `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
-                : "";
         }
 
         function resetTransactionForm() {
@@ -553,8 +550,17 @@
             loadApp();
         });
 
-        document.getElementById("transactionDate").addEventListener("input", function(event) {
-            document.getElementById("transactionDateValue").value = parseDisplayDate(event.target.value);
+        document.getElementById("transactionDateValue").addEventListener("change", function(event) {
+            setTransactionDate(event.target.value);
+        });
+
+        document.getElementById("transactionDate").addEventListener("click", function() {
+            const datePicker = document.getElementById("transactionDateValue");
+            if (typeof datePicker.showPicker === "function") {
+                datePicker.showPicker();
+            } else {
+                datePicker.click();
+            }
         });
 
         // 2. VALIDATE THE CURRENT BALANCE
