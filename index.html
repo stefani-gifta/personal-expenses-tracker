@@ -355,6 +355,16 @@
             status.style.display = message ? "block" : "none";
         }
 
+        function showBalance(balance) {
+            const balanceDisplay = document.getElementById("balanceDisplay");
+            const balanceValidation = document.getElementById("balanceValidation");
+
+            balanceDisplay.innerText = `Current Balance: ${formatBalance(balance)}`;
+            balanceDisplay.style.display = Number.isFinite(Number(balance)) ? "block" : "none";
+            balanceValidation.style.display = Number.isFinite(Number(balance)) ? "block" : "none";
+            setValidationStatus("");
+        }
+
         resetTransactionForm();
 
         // 1. LOAD CATEGORIES AFTER AUTHENTICATION
@@ -436,12 +446,7 @@
                 });
 
                 // Set initial balance display
-                const balanceDisplay = document.getElementById("balanceDisplay");
-                balanceDisplay.innerText =
-                    `Current Balance: ${formatBalance(data.balance)}`;
-                balanceDisplay.style.display = "block";
-                document.getElementById("balanceValidation").style.display = "block";
-                setValidationStatus("");
+                showBalance(data.balance);
                 
                 // Enable Submit Button
                 const submitBtn = document.getElementById("submitBtn");
@@ -555,11 +560,7 @@
                 const result = await response.json();
 
                 if (result.status === "success") {
-                    balanceDisplay.style.display = "block";
-                    balanceDisplay.innerText =
-                        `Current Balance: ${formatBalance(result.balance)}`;
-                    document.getElementById("balanceValidation").style.display = "block";
-                    setValidationStatus("");
+                    showBalance(result.balance);
                     document.getElementById("amount").value = "";
                     document.getElementById("note").value = "";
                 } else {
