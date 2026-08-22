@@ -397,7 +397,7 @@
             const balanceDisplay = document.getElementById("balanceDisplay");
             balanceDisplay.innerText = "Current Balance: Fetching...";
             balanceDisplay.style.display = "block";
-            document.getElementById("balanceValidation").style.display = "none";
+            document.getElementById("balanceValidation").style.display = "block";
 
             try {
                 const requestUrl = `${webAppUrl}?apiKey=${encodeURIComponent(apiKey)}&walletRow=${encodeURIComponent(walletRow)}`;
