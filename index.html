@@ -168,6 +168,61 @@
             border-radius: 8px;
         }
 
+        #balanceValidation {
+            display: none;
+            margin-top: 12px;
+            padding: 14px;
+            border: 1.5px solid #E4DBF5;
+            border-radius: 8px;
+            background: #ffffff;
+        }
+
+        #balanceValidation p {
+            margin: 0 0 10px;
+            font-size: 12px;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        .validation-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .validation-actions button {
+            margin-top: 0;
+            padding: 10px;
+            font-size: 12px;
+        }
+
+        #confirmBalanceBtn {
+            background-color: #2F7D5A;
+            color: #FFFFFF;
+        }
+
+        #confirmBalanceBtn:hover:not(:disabled) {
+            background-color: #246446;
+        }
+
+        #rejectBalanceBtn {
+            background-color: #f4f2f7;
+            color: #7C5CBF;
+            border: 1.5px solid #E4DBF5;
+        }
+
+        #validationStatus {
+            display: none;
+            margin: 10px 0 0;
+            font-size: 11px;
+            line-height: 1.5;
+            text-align: center;
+            font-style: italic;
+        }
+
+        #validationStatus.success { color: #2F7D5A; }
+        #validationStatus.error { color: #B0233F; }
+
         .loading-text { color: #9C93B3; font-style: italic; }
 
         #authGate,
@@ -249,6 +304,16 @@
     <!-- Wallet Balance Output -->
     <div id="balanceDisplay">Current Balance: Fetching...</div>
 
+    <!-- Balance Validation -->
+    <section id="balanceValidation" aria-labelledby="validationPrompt">
+        <p id="validationPrompt">Is this balance correct?</p>
+        <div class="validation-actions">
+            <button type="button" id="confirmBalanceBtn" onclick="validateBalance(true)">Yes</button>
+            <button type="button" id="rejectBalanceBtn" onclick="validateBalance(false)">No</button>
+        </div>
+        <p id="validationStatus" role="status"></p>
+    </section>
+
     <!-- Submit Button -->
     <button id="submitBtn" onclick="sendTransaction()" disabled>Loading Sheet Configuration...</button>
     <button type="button" id="resetBtn" onclick="resetTransactionForm()">Reset</button>
@@ -279,6 +344,15 @@
             document.getElementById("amount").value = "";
             document.getElementById("note").value = "";
             document.getElementById("balanceDisplay").style.display = "none";
+            document.getElementById("balanceValidation").style.display = "none";
+            setValidationStatus("");
+        }
+
+        function setValidationStatus(message, statusClass = "") {
+            const status = document.getElementById("validationStatus");
+            status.innerText = message;
+            status.className = statusClass;
+            status.style.display = message ? "block" : "none";
         }
 
         resetTransactionForm();
@@ -362,8 +436,12 @@
                 });
 
                 // Set initial balance display
-                document.getElementById("balanceDisplay").innerText =
+                const balanceDisplay = document.getElementById("balanceDisplay");
+                balanceDisplay.innerText =
                     `Current Balance: ${formatBalance(data.balance)}`;
+                balanceDisplay.style.display = "block";
+                document.getElementById("balanceValidation").style.display = "block";
+                setValidationStatus("");
                 
                 // Enable Submit Button
                 const submitBtn = document.getElementById("submitBtn");
@@ -388,7 +466,50 @@
             loadApp();
         });
 
-        // 2. SEND THE TRANSACTION
+        // 2. VALIDATE THE CURRENT BALANCE
+        async function validateBalance(isCorrect) {
+            const confirmButton = document.getElementById("confirmBalanceBtn");
+            const rejectButton = document.getElementById("rejectBalanceBtn");
+
+            if (!isCorrect) {
+                setValidationStatus("Balance not confirmed. Add a transaction or refresh to check again.");
+                return;
+            }
+
+            confirmButton.disabled = true;
+            rejectButton.disabled = true;
+            confirmButton.innerHTML = '<span class="btn-spinner"></span>Saving...';
+            setValidationStatus("");
+
+            try {
+                const response = await fetch(webAppUrl, {
+                    method: "POST",
+                    mode: "cors",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({
+                        apiKey,
+                        action: "validateBalance",
+                        validation: "yes",
+                        "trakhir check": getToday()
+                    })
+                });
+
+                const result = await response.json();
+                if (result.status !== "success") {
+                    throw new Error(result.message || "Failed to save validation.");
+                }
+
+                setValidationStatus(`Balance confirmed on ${getToday()}.`, "success");
+            } catch (error) {
+                setValidationStatus(error.message, "error");
+            } finally {
+                confirmButton.disabled = false;
+                rejectButton.disabled = false;
+                confirmButton.innerText = "Yes";
+            }
+        }
+
+        // 3. SEND THE TRANSACTION
         async function sendTransaction() {
             const submitBtn = document.getElementById("submitBtn");
             const balanceDisplay = document.getElementById("balanceDisplay");
@@ -437,6 +558,8 @@
                     balanceDisplay.style.display = "block";
                     balanceDisplay.innerText =
                         `Current Balance: ${formatBalance(result.balance)}`;
+                    document.getElementById("balanceValidation").style.display = "block";
+                    setValidationStatus("");
                     document.getElementById("amount").value = "";
                     document.getElementById("note").value = "";
                 } else {
