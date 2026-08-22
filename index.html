@@ -315,6 +315,8 @@
         // Replace with your copied Google Apps Script Web App URL
         const webAppUrl = "WEB_APP_URL";
         let apiKey = "";
+        let selectedWalletRow = "";
+        let balanceRequestId = 0;
 
         function formatBalance(value) {
             const amount = Number(value);
@@ -354,6 +356,51 @@
             balanceDisplay.style.display = Number.isFinite(Number(balance)) ? "block" : "none";
             balanceValidation.style.display = Number.isFinite(Number(balance)) ? "block" : "none";
             setValidationStatus("");
+        }
+
+        function getSelectedWalletRow() {
+            const walletInput = document.getElementById("wallet");
+            const walletOption = document.querySelector(
+                `#walletList option[value="${CSS.escape(walletInput.value)}"]`
+            );
+            return walletOption?.dataset.row || "";
+        }
+
+        async function loadWalletBalance(walletRow) {
+            const requestId = ++balanceRequestId;
+            selectedWalletRow = walletRow || "";
+            setValidationStatus("");
+
+            if (!walletRow) {
+                showBalance(null);
+                return;
+            }
+
+            const balanceDisplay = document.getElementById("balanceDisplay");
+            balanceDisplay.innerText = "Current Balance: Fetching...";
+            balanceDisplay.style.display = "block";
+            document.getElementById("balanceValidation").style.display = "none";
+
+            try {
+                const requestUrl = `${webAppUrl}?apiKey=${encodeURIComponent(apiKey)}&walletRow=${encodeURIComponent(walletRow)}`;
+                const response = await fetch(requestUrl);
+                const data = await response.json();
+
+                if (requestId !== balanceRequestId) {
+                    return;
+                }
+                if (!response.ok || data.error) {
+                    throw new Error(data.error || "Unable to load wallet balance.");
+                }
+
+                showBalance(data.balance);
+            } catch (error) {
+                if (requestId !== balanceRequestId) {
+                    return;
+                }
+                showBalance(null);
+                setValidationStatus(error.message, "error");
+            }
         }
 
         resetTransactionForm();
@@ -443,8 +490,14 @@
                     walletList.appendChild(option);
                 });
 
-                // Set initial balance display
-                showBalance(data.balance);
+                const walletInput = document.getElementById("wallet");
+                const updateWalletBalance = () => {
+                    loadWalletBalance(getSelectedWalletRow());
+                };
+                walletInput.addEventListener("input", updateWalletBalance);
+                walletInput.addEventListener("change", updateWalletBalance);
+
+                showBalance(null);
                 
                 // Enable Submit Button
                 const submitBtn = document.getElementById("submitBtn");
@@ -472,10 +525,7 @@
         // 2. VALIDATE THE CURRENT BALANCE
         async function validateBalance() {
             const confirmButton = document.getElementById("confirmBalanceBtn");
-            const walletSelect = document.getElementById("wallet");
-            const selectedWallet = [...walletSelect.list.options]
-                .find(option => option.value === walletSelect.value);
-            const walletRow = selectedWallet?.dataset.row;
+            const walletRow = getSelectedWalletRow();
 
             if (!walletRow) {
                 setValidationStatus("Select a wallet before confirming the balance.", "error");
@@ -516,6 +566,7 @@
         async function sendTransaction() {
             const submitBtn = document.getElementById("submitBtn");
             const balanceDisplay = document.getElementById("balanceDisplay");
+            selectedWalletRow = getSelectedWalletRow();
 
             const amountValue = document.getElementById("amount").value.trim();
             const payload = {
