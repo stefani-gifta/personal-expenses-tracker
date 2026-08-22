@@ -261,7 +261,8 @@
     <!-- Transaction Date -->
     <div class="form-group">
         <label for="transactionDate">Date</label>
-        <input type="date" id="transactionDate" required>
+        <input type="text" id="transactionDate" placeholder="dd MMM yyyy" autocomplete="off" required>
+        <input type="date" id="transactionDateValue" hidden>
     </div>
 
     <!-- Dynamic Expense Category Selection -->
@@ -332,8 +333,38 @@
             return `${today.getFullYear()}-${month}-${day}`;
         }
 
+        function formatDateForDisplay(isoDate) {
+            const [year, month, day] = isoDate.split("-");
+            const monthName = new Intl.DateTimeFormat("en", { month: "short" })
+                .format(new Date(Number(year), Number(month) - 1, 1));
+            return `${day} ${monthName} ${year}`;
+        }
+
+        function setTransactionDate(isoDate) {
+            document.getElementById("transactionDateValue").value = isoDate;
+            document.getElementById("transactionDate").value = formatDateForDisplay(isoDate);
+        }
+
+        function parseDisplayDate(value) {
+            const match = value.trim().match(/^(\d{2}) ([A-Za-z]{3}) (\d{4})$/);
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const month = match ? monthNames.indexOf(match[2]) : -1;
+
+            if (!match || month < 0) {
+                return "";
+            }
+
+            const day = Number(match[1]);
+            const year = Number(match[3]);
+            const date = new Date(year, month, day);
+
+            return date.getFullYear() === year && date.getMonth() === month && date.getDate() === day
+                ? `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+                : "";
+        }
+
         function resetTransactionForm() {
-            document.getElementById("transactionDate").value = getToday();
+            setTransactionDate(getToday());
             document.getElementById("amount").value = "";
             document.getElementById("note").value = "";
             document.getElementById("balanceDisplay").style.display = "none";
@@ -522,6 +553,10 @@
             loadApp();
         });
 
+        document.getElementById("transactionDate").addEventListener("input", function(event) {
+            document.getElementById("transactionDateValue").value = parseDisplayDate(event.target.value);
+        });
+
         // 2. VALIDATE THE CURRENT BALANCE
         async function validateBalance() {
             const confirmButton = document.getElementById("confirmBalanceBtn");
@@ -571,7 +606,7 @@
             const amountValue = document.getElementById("amount").value.trim();
             const payload = {
                 apiKey,
-                date: document.getElementById("transactionDate").value,
+                date: document.getElementById("transactionDateValue").value,
                 type: document.getElementById("type").value,
                 wallet: document.getElementById("wallet").value,
                 note: document.getElementById("note").value,
