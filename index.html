@@ -63,7 +63,7 @@
             padding: 12px;
             margin-top: 2px;
             font-family: 'Space Mono', monospace;
-            font-size: 16px;
+            font-size: 14px;
             text-align: left;
             color: #2B2438;
             background: #f4f2f7;
@@ -91,7 +91,7 @@
         }
 
         #note {
-            font-size: 90%;
+            font-size: 11px;
         }
 
         .date-input-wrapper {
@@ -112,7 +112,7 @@
             padding: 12px;
             margin-top: 8px;
             font-family: 'Space Mono', monospace;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 700;
             letter-spacing: 0.04em;
             text-transform: uppercase;
@@ -170,7 +170,7 @@
 
         #balanceDisplay {
             font-family: 'Space Mono', monospace;
-            font-size: 16px;
+            font-size: 14px;
             margin: 0;
             display: none;
             font-weight: 700;
@@ -234,7 +234,7 @@
             display: none;
             color: #B0233F;
             margin-top: 10px;
-            font-size: 13px;
+            font-size: 11px;
             font-style: italic;
             min-height: 16px;
             font-family: 'Space Mono', monospace;
@@ -291,7 +291,7 @@
     <section id="balanceValidation">
         <div id="balanceDisplay">Current Balance: Fetching...</div>
         <div class="validation-actions">
-            <button type="button" id="confirmBalanceBtn" onclick="validateBalance()">Yes</button>
+            <button type="button" id="confirmBalanceBtn" onclick="validateBalance()">Update last check</button>
         </div>
         <p id="validationStatus" role="status"></p>
     </section>
@@ -308,7 +308,7 @@
         <input
             type="text"
             id="note"
-            placeholder="Description" required>
+            placeholder="" required>
     </div>
 
     <!-- Submit Button -->
@@ -589,7 +589,7 @@
                 setValidationStatus(error.message, "error");
             } finally {
                 confirmButton.disabled = false;
-                confirmButton.innerText = "Yes";
+                confirmButton.innerText = "Update last check";
             }
         }
 
