@@ -185,9 +185,7 @@
         }
 
         .validation-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            display: block;
         }
 
         .validation-actions button {
@@ -203,12 +201,6 @@
 
         #confirmBalanceBtn:hover:not(:disabled) {
             background-color: #246446;
-        }
-
-        #rejectBalanceBtn {
-            background-color: #f4f2f7;
-            color: #7C5CBF;
-            border: 1.5px solid #E4DBF5;
         }
 
         #validationStatus {
@@ -308,8 +300,7 @@
     <section id="balanceValidation" aria-labelledby="validationPrompt">
         <p id="validationPrompt">Is this balance correct?</p>
         <div class="validation-actions">
-            <button type="button" id="confirmBalanceBtn" onclick="validateBalance(true)">Yes</button>
-            <button type="button" id="rejectBalanceBtn" onclick="validateBalance(false)">No</button>
+            <button type="button" id="confirmBalanceBtn" onclick="validateBalance()">Yes</button>
         </div>
         <p id="validationStatus" role="status"></p>
     </section>
@@ -472,17 +463,10 @@
         });
 
         // 2. VALIDATE THE CURRENT BALANCE
-        async function validateBalance(isCorrect) {
+        async function validateBalance() {
             const confirmButton = document.getElementById("confirmBalanceBtn");
-            const rejectButton = document.getElementById("rejectBalanceBtn");
-
-            if (!isCorrect) {
-                setValidationStatus("Balance not confirmed. Add a transaction or refresh to check again.");
-                return;
-            }
 
             confirmButton.disabled = true;
-            rejectButton.disabled = true;
             confirmButton.innerHTML = '<span class="btn-spinner"></span>Saving...';
             setValidationStatus("");
 
@@ -509,7 +493,6 @@
                 setValidationStatus(error.message, "error");
             } finally {
                 confirmButton.disabled = false;
-                rejectButton.disabled = false;
                 confirmButton.innerText = "Yes";
             }
         }
