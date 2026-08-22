@@ -171,30 +171,23 @@
         #balanceDisplay {
             font-family: 'Space Mono', monospace;
             font-size: 16px;
-            margin-top: 24px;
+            margin: 0;
             display: none;
             font-weight: 700;
             text-align: center;
             color: #4C1D95;
-            padding: 14px;
+            padding: 0 0 14px;
             background: #EDE7F6;
             border-radius: 8px;
         }
 
         #balanceValidation {
             display: none;
-            margin-top: 12px;
+            margin: 24px 0;
             padding: 14px;
             border: 1.5px solid #E4DBF5;
             border-radius: 8px;
-            background: #ffffff;
-        }
-
-        #balanceValidation p {
-            margin: 0 0 10px;
-            font-size: 12px;
-            line-height: 1.5;
-            text-align: center;
+            background: #EDE7F6;
         }
 
         .validation-actions {
@@ -213,7 +206,7 @@
         }
 
         #confirmBalanceBtn:hover:not(:disabled) {
-            background-color: #246446;
+            background-color: #24644667;
         }
 
         #validationStatus {
@@ -294,6 +287,15 @@
         <datalist id="walletList"></datalist>
     </div>
 
+    <!-- Balance Validation -->
+    <section id="balanceValidation">
+        <div id="balanceDisplay">Current Balance: Fetching...</div>
+        <div class="validation-actions">
+            <button type="button" id="confirmBalanceBtn" onclick="validateBalance()">Yes</button>
+        </div>
+        <p id="validationStatus" role="status"></p>
+    </section>
+
     <!-- Amount -->
     <div class="form-group">
         <label for="amount">Amount</label>
@@ -309,18 +311,6 @@
             placeholder="Description" required>
     </div>
 
-    <!-- Wallet Balance Output -->
-    <div id="balanceDisplay">Current Balance: Fetching...</div>
-
-    <!-- Balance Validation -->
-    <section id="balanceValidation" aria-labelledby="validationPrompt">
-        <p id="validationPrompt">Is this balance correct?</p>
-        <div class="validation-actions">
-            <button type="button" id="confirmBalanceBtn" onclick="validateBalance()">Yes</button>
-        </div>
-        <p id="validationStatus" role="status"></p>
-    </section>
-
     <!-- Submit Button -->
     <button id="submitBtn" onclick="sendTransaction()" disabled>Loading Sheet Configuration...</button>
     <button type="button" id="resetBtn" onclick="resetTransactionForm()">Reset</button>
@@ -329,7 +319,7 @@
 
     <script>
         // Replace with your copied Google Apps Script Web App URL
-        const webAppUrl = "WEB_APP_URL";
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbyVsw-6hYIZlpUiNefaNi-bYIeSXTkZ5pcQyeBY09cW2c99ViDUJ_hf5cL6qtczhTy-Kg/exec";
         let apiKey = "";
         let selectedWalletRow = "";
         let balanceRequestId = 0;
