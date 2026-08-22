@@ -429,10 +429,17 @@
                 blankWalletOption.text = "Unselected";
                 walletList.appendChild(blankWalletOption);
                 
-                data.wallets.forEach(w => {
+                data.wallets.forEach((wallet, index) => {
+                    const walletName = typeof wallet === "object"
+                        ? (wallet.name || wallet.wallet || wallet.value)
+                        : wallet;
+                    const walletRow = typeof wallet === "object"
+                        ? (wallet.row || wallet.walletRow)
+                        : data.walletRows?.[index];
                     const option = document.createElement("option");
-                    option.value = w;
-                    option.text = w;
+                    option.value = walletName;
+                    option.text = walletName;
+                    option.dataset.row = walletRow || "";
                     walletList.appendChild(option);
                 });
 
@@ -465,6 +472,15 @@
         // 2. VALIDATE THE CURRENT BALANCE
         async function validateBalance() {
             const confirmButton = document.getElementById("confirmBalanceBtn");
+            const walletSelect = document.getElementById("wallet");
+            const selectedWallet = [...walletSelect.list.options]
+                .find(option => option.value === walletSelect.value);
+            const walletRow = selectedWallet?.dataset.row;
+
+            if (!walletRow) {
+                setValidationStatus("Select a wallet before confirming the balance.", "error");
+                return;
+            }
 
             confirmButton.disabled = true;
             confirmButton.innerHTML = '<span class="btn-spinner"></span>Saving...';
@@ -477,9 +493,8 @@
                     headers: { "Content-Type": "text/plain;charset=utf-8" },
                     body: JSON.stringify({
                         apiKey,
-                        action: "validateBalance",
-                        validation: "yes",
-                        "trakhir check": getToday()
+                        action: "confirmBalance",
+                        walletRow
                     })
                 });
 
