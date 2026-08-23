@@ -615,6 +615,12 @@
             selectedWalletRow = getSelectedWalletRow();
 
             const amountValue = document.getElementById("amount").value.trim();
+            const arithmeticFormulaPattern = /^=\s*[0-9\s()+\-*/%.]+$/;
+            if (amountValue.startsWith("=") && !arithmeticFormulaPattern.test(amountValue)) {
+                alert("Only basic arithmetic formulas are allowed.");
+                return;
+            }
+
             const payload = {
                 apiKey,
                 date: document.getElementById("transactionDateValue").value,
