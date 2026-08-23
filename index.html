@@ -400,8 +400,16 @@
             document.getElementById("balanceValidation").style.display = "block";
 
             try {
-                const requestUrl = `${webAppUrl}?apiKey=${encodeURIComponent(apiKey)}&walletRow=${encodeURIComponent(walletRow)}`;
-                const response = await fetch(requestUrl);
+                const response = await fetch(webAppUrl, {
+                    method: "POST",
+                    mode: "cors",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({
+                        apiKey,
+                        action: "getBalance",
+                        walletRow
+                    })
+                });
                 const data = await response.json();
 
                 if (requestId !== balanceRequestId) {
@@ -435,8 +443,15 @@
             authError.innerText = "";
 
             try {
-                const requestUrl = `${webAppUrl}?apiKey=${encodeURIComponent(apiKey)}`;
-                const response = await fetch(requestUrl);
+                const response = await fetch(webAppUrl, {
+                    method: "POST",
+                    mode: "cors",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({
+                        apiKey,
+                        action: "initialize"
+                    })
+                });
                 const data = await response.json();
                 
                 if (!response.ok || data.error) {
