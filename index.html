@@ -454,8 +454,14 @@
                 });
                 const data = await response.json();
                 
-                if (!response.ok || data.error) {
-                    throw new Error(data.error || "Authentication failed.");
+                if (!response.ok || data.error || data.status === "error") {
+                    throw new Error(data.error || data.message || "Authentication failed.");
+                }
+
+                if (!Array.isArray(data.types) ||
+                    !Array.isArray(data.wallets) ||
+                    !Array.isArray(data.expenseCategory)) {
+                    throw new Error("The backend did not return initialization data. Redeploy the Apps Script with the initialize action enabled.");
                 }
 
                 authGate.style.display = "none";
@@ -464,7 +470,7 @@
                 // Populate Type Dropdown
                 const typeSelect = document.getElementById("type");
                 typeSelect.innerHTML = "";
-                data.types.toReversed().forEach(t => {
+                data.types.slice().reverse().forEach(t => {
                     typeSelect.options[typeSelect.options.length] = new Option(t, t);
                 }); // Expenses as default
 
