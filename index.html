@@ -574,6 +574,22 @@
             }
         });
 
+        document.getElementById("amount").addEventListener("keydown", function(event) {
+            if (event.key === "Enter" || event.key === "ArrowDown") {
+                event.preventDefault();
+                document.getElementById("note").focus();
+                document.getElementById("note").select();
+            }
+        });
+
+        // Add Enter key support for transaction submission
+        document.getElementById("note").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                sendTransaction();
+            }
+        });
+
         // 2. VALIDATE THE CURRENT BALANCE
         async function validateBalance() {
             const confirmButton = document.getElementById("confirmBalanceBtn");
