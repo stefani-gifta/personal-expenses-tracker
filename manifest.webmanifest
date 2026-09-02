@@ -1,0 +1,16 @@
+{
+  "name": "Gifta's Expenses Tracker",
+  "short_name": "Expenses Tracker",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#7C5CBF",
+  "background_color": "#F1EEF7",
+  "icons": [
+    {
+      "src": "purple-star.png",
+      "sizes": "365x350",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
