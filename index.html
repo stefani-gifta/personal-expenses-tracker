@@ -105,7 +105,14 @@
             height: calc(100% - 2px);
             opacity: 0;
             cursor: pointer;
-            z-index: 1;
+            pointer-events: none;
+        }
+
+        @media (max-width: 480px) {
+            #transactionDateValue {
+                pointer-events: auto;
+                z-index: 1;
+            }
         }
 
         button {
