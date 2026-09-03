@@ -335,9 +335,34 @@
     <script>
         // Replace with your copied Google Apps Script Web App URL
         const webAppUrl = "WEB_APP_URL";
+        const savedApiKeyStorageKey = "expensesTrackerApiKey";
         let apiKey = "";
         let selectedWalletRow = "";
         let balanceRequestId = 0;
+
+        function getSavedApiKey() {
+            try {
+                return localStorage.getItem(savedApiKeyStorageKey) || "";
+            } catch (error) {
+                return "";
+            }
+        }
+
+        function saveApiKey() {
+            try {
+                localStorage.setItem(savedApiKeyStorageKey, apiKey);
+            } catch (error) {
+                // Private browsing or storage restrictions should not block login.
+            }
+        }
+
+        function clearSavedApiKey() {
+            try {
+                localStorage.removeItem(savedApiKeyStorageKey);
+            } catch (error) {
+                // Ignore storage restrictions while handling an invalid password.
+            }
+        }
 
         function formatBalance(value) {
             const amount = Number(value);
@@ -481,6 +506,7 @@
 
                 authGate.style.display = "none";
                 app.style.display = "block";
+                saveApiKey();
 
                 // Populate Type Dropdown
                 const typeSelect = document.getElementById("type");
@@ -563,6 +589,7 @@
                 authError.innerText = error.message;
                 authError.style.display = "block";
                 apiKey = "";
+                clearSavedApiKey();
                 document.getElementById("apiKey").value = "";
             } finally {
                 authButton.disabled = false;
@@ -575,6 +602,12 @@
             apiKey = document.getElementById("apiKey").value;
             loadApp();
         });
+
+        apiKey = getSavedApiKey();
+        if (apiKey) {
+            document.getElementById("apiKey").value = apiKey;
+            loadApp();
+        }
 
         document.getElementById("transactionDateValue").addEventListener("change", function(event) {
             setTransactionDate(event.target.value);
