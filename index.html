@@ -196,6 +196,26 @@
             border-radius: 8px;
         }
 
+        #lastCheckDisplay {
+            display: block;
+            margin-top: 6px;
+            font-size: 11px;
+            font-weight: 400;
+            color: #7C5CBF;
+        }
+
+        #interestGroup {
+            margin-top: 14px;
+        }
+
+        #interestGroup label {
+            margin-bottom: 4px;
+        }
+
+        #interest {
+            font-size: 12px;
+        }
+
         #balanceValidation {
             display: none;
             margin: 24px 0;
@@ -304,7 +324,14 @@
 
     <!-- Balance Validation -->
     <section id="balanceValidation">
-        <div id="balanceDisplay">Current Balance: Fetching...</div>
+        <div id="balanceDisplay">
+            Current Balance: Fetching...
+            <span id="lastCheckDisplay"></span>
+        </div>
+        <div id="interestGroup" class="form-group">
+            <label for="interest">Interest Formula</label>
+            <input type="text" id="interest" placeholder="Enter formula..." autocomplete="off">
+        </div>
         <div class="validation-actions">
             <button type="button" id="confirmBalanceBtn" onclick="validateBalance()">Update last check</button>
         </div>
@@ -394,6 +421,7 @@
             setTransactionDate(getToday());
             document.getElementById("amount").value = "";
             document.getElementById("note").value = "";
+            document.getElementById("interest").value = "";
             document.getElementById("balanceDisplay").style.display = "none";
             document.getElementById("balanceValidation").style.display = "none";
             setValidationStatus("");
@@ -406,14 +434,31 @@
             status.style.display = message ? "block" : "none";
         }
 
-        function showBalance(balance) {
+        function showBalance(balance, dateCell = "", interest = "") {
             const balanceDisplay = document.getElementById("balanceDisplay");
             const balanceValidation = document.getElementById("balanceValidation");
+            const lastCheckDisplay = document.getElementById("lastCheckDisplay");
+            const interestInput = document.getElementById("interest");
 
-            balanceDisplay.innerText = `Current Balance: ${formatBalance(balance)}`;
-            balanceDisplay.style.display = Number.isFinite(Number(balance)) ? "block" : "none";
-            balanceValidation.style.display = Number.isFinite(Number(balance)) ? "block" : "none";
+            balanceDisplay.firstChild.textContent = `Current Balance: ${formatBalance(balance)}`;
+            lastCheckDisplay.textContent = dateCell
+                ? `Last checked: ${formatDateCell(dateCell)}`
+                : "Last checked: Not available";
+            interestInput.value = interest ?? "";
+            const hasBalance = Number.isFinite(Number(balance));
+            balanceDisplay.style.display = hasBalance ? "block" : "none";
+            balanceValidation.style.display = hasBalance ? "block" : "none";
             setValidationStatus("");
+        }
+
+        function formatDateCell(value) {
+            const dateText = String(value).trim();
+            if (!dateText) {
+                return "Not available";
+            }
+
+            const isoDate = dateText.match(/^(\d{4})-(\d{2})-(\d{2})/);
+            return isoDate ? formatDateForDisplay(isoDate[0]) : dateText;
         }
 
         function getSelectedWalletRow() {
@@ -435,9 +480,10 @@
             }
 
             const balanceDisplay = document.getElementById("balanceDisplay");
-            balanceDisplay.innerText = "Current Balance: Fetching...";
+            balanceDisplay.firstChild.textContent = "Current Balance: Fetching...";
             balanceDisplay.style.display = "block";
             document.getElementById("balanceValidation").style.display = "block";
+            document.getElementById("interest").value = "";
 
             try {
                 const response = await fetch(webAppUrl, {
@@ -459,7 +505,7 @@
                     throw new Error(data.error || "Unable to load wallet balance.");
                 }
 
-                showBalance(data.balance);
+                showBalance(data.balance, data.dateCell, data.interest);
             } catch (error) {
                 if (requestId !== balanceRequestId) {
                     return;
@@ -638,6 +684,56 @@
             }
         });
 
+        document.getElementById("interest").addEventListener("change", updateInterestFormula);
+        document.getElementById("interest").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                updateInterestFormula();
+            }
+        });
+
+        async function updateInterestFormula() {
+            const interestInput = document.getElementById("interest");
+            const interestFormula = interestInput.value.trim();
+            const walletRow = getSelectedWalletRow();
+
+            if (!walletRow) {
+                setValidationStatus("Select a wallet before editing interest.", "error");
+                return;
+            }
+            if (interestFormula && !interestFormula.startsWith("=")) {
+                setValidationStatus("Interest must be entered as a formula starting with =.", "error");
+                return;
+            }
+
+            interestInput.disabled = true;
+            setValidationStatus("");
+
+            try {
+                const response = await fetch(webAppUrl, {
+                    method: "POST",
+                    mode: "cors",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({
+                        apiKey,
+                        action: "updateInterestFormula",
+                        walletRow,
+                        interest: interestFormula
+                    })
+                });
+                const result = await response.json();
+                if (!response.ok || result.error || result.status !== "success") {
+                    throw new Error(result.error || result.message || "Failed to update interest formula.");
+                }
+
+                setValidationStatus("Interest formula updated.", "success");
+            } catch (error) {
+                setValidationStatus(error.message, "error");
+            } finally {
+                interestInput.disabled = false;
+            }
+        }
+
         // 2. VALIDATE THE CURRENT BALANCE
         async function validateBalance() {
             const confirmButton = document.getElementById("confirmBalanceBtn");
@@ -669,7 +765,7 @@
                     throw new Error(result.message || "Failed to save validation.");
                 }
 
-                setValidationStatus(`Balance confirmed on ${getToday()}.`, "success");
+                setValidationStatus(`Balance confirmed.`, "success");
             } catch (error) {
                 setValidationStatus(error.message, "error");
             } finally {
