@@ -827,7 +827,7 @@
                 const result = await response.json();
 
                 if (result.status === "success") {
-                    showBalance(result.balance);
+                    showBalance(result.balance, result.dateCell, result.interest);
                     document.getElementById("amount").value = "";
                     document.getElementById("note").value = "";
                 } else {
