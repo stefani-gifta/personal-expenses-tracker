@@ -29,6 +29,7 @@
             display: flex;
             align-items: center;
             animation: fadeIn 0.7s ease-in forwards;
+            padding-bottom: 92px;
         }
 
         @media (max-width: 480px) {
@@ -274,6 +275,91 @@
             min-height: 16px;
             font-family: 'Space Mono', monospace;
         }
+
+        .app-view { display: none; }
+        .app-view.active { display: block; }
+
+        .page-heading {
+            margin: 0 0 24px;
+            font-size: 20px;
+            line-height: 1.35;
+        }
+
+        .rows-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .rows-toolbar p { margin: 0; color: #7C5CBF; font-size: 11px; }
+
+        #refreshRowsBtn {
+            width: auto;
+            margin: 0;
+            padding: 8px 10px;
+            color: #7C5CBF;
+            background: #f4f2f7;
+            border: 1.5px solid #E4DBF5;
+        }
+
+        .table-wrapper { overflow-x: auto; margin: 0 -8px; padding: 0 8px 8px; }
+
+        #transactionsTable {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+            white-space: nowrap;
+        }
+
+        #transactionsTable th {
+            padding: 9px 8px;
+            color: #7C5CBF;
+            font-size: 9px;
+            text-align: left;
+            letter-spacing: 0.04em;
+            border-bottom: 1.5px solid #E4DBF5;
+        }
+
+        #transactionsTable td {
+            padding: 11px 8px;
+            vertical-align: top;
+            border-bottom: 1px solid #E4DBF5;
+        }
+
+        #transactionsTable tbody tr:hover { background: #f4f2f7; }
+        .row-actions { display: flex; gap: 6px; }
+        .row-actions button {
+            width: auto;
+            margin: 0;
+            padding: 6px 8px;
+            font-size: 9px;
+        }
+        .edit-row-btn { color: #2F7D5A; background: #e8f3ed; }
+        .delete-row-btn { color: #B0233F; background: #fbecef; }
+        #rowsStatus { min-height: 18px; margin: 12px 0 0; color: #9C93B3; font-size: 11px; font-style: italic; }
+
+        #bottomNav {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 3;
+            display: none;
+            justify-content: center;
+            gap: 4px;
+            padding: 10px 20px 14px;
+            background: rgba(241, 238, 247, 0.96);
+            border-top: 1px solid #E4DBF5;
+        }
+
+        .nav-btn { width: auto; min-width: 110px; margin: 0; padding: 10px 18px; color: #9C93B3; background: transparent; }
+        .nav-btn.active { color: #FFFFFF; background: #7C5CBF; }
+
+        @media (min-width: 481px) {
+            #bottomNav { left: calc(50% - 200px); right: calc(50% - 200px); }
+        }
     </style>
 </head>
 <body>
@@ -290,6 +376,9 @@
     </section>
 
     <main id="app">
+
+    <section id="formView" class="app-view active">
+    <h1 class="page-heading">New transaction</h1>
 
     <!-- Dynamic Type Selection -->
     <div class="form-group">
@@ -356,16 +445,47 @@
     <!-- Submit Button -->
     <button id="submitBtn" onclick="sendTransaction()" disabled>Loading Sheet Configuration...</button>
     <button type="button" id="resetBtn" onclick="resetTransactionForm()">Reset</button>
-    
+    </section>
+
+    <section id="rowsView" class="app-view">
+        <h1 class="page-heading">Saved rows</h1>
+        <div class="rows-toolbar">
+            <p id="rowsCount">0 of 25 rows</p>
+            <button type="button" id="refreshRowsBtn" title="Refresh rows">Refresh</button>
+        </div>
+        <div class="table-wrapper">
+            <table id="transactionsTable">
+                <thead>
+                    <tr>
+                        <th>ROW</th>
+                        <th>DATE</th>
+                        <th>CATEGORIES</th>
+                        <th>TAKE MONEY FROM</th>
+                        <th>NOTE</th>
+                        <th>AMOUNT</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody id="transactionsBody"></tbody>
+            </table>
+        </div>
+        <p id="rowsStatus" role="status"></p>
+    </section>
     </main>
+
+    <nav id="bottomNav" aria-label="Main navigation">
+        <button type="button" class="nav-btn active" data-view="formView">Form</button>
+        <button type="button" class="nav-btn" data-view="rowsView">Rows</button>
+    </nav>
 
     <script>
         // Replace with your copied Google Apps Script Web App URL
-        const webAppUrl = "WEB_APP_URL";
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbyVz4gL_H492LS28iyjxMYiFk5nYatl8IC5Kq3PK2K183IfdQWrYRrQU2w8rbXvt2kq0w/exec";
         const savedApiKeyStorageKey = "expensesTrackerApiKey";
         let apiKey = "";
         let selectedWalletRow = "";
         let balanceRequestId = 0;
+        let editingRow = null;
 
         function getSavedApiKey() {
             try {
@@ -418,10 +538,13 @@
         }
 
         function resetTransactionForm() {
+            editingRow = null;
             setTransactionDate(getToday());
             document.getElementById("amount").value = "";
             document.getElementById("note").value = "";
             document.getElementById("interest").value = "";
+            const submitButton = document.getElementById("submitBtn");
+            if (submitButton && !submitButton.disabled) submitButton.innerText = "Submit Transaction";
             document.getElementById("balanceDisplay").style.display = "none";
             document.getElementById("balanceValidation").style.display = "none";
             setValidationStatus("");
@@ -515,6 +638,126 @@
             }
         }
 
+        function showView(viewId) {
+            document.querySelectorAll(".app-view").forEach(view => {
+                view.classList.toggle("active", view.id === viewId);
+            });
+            document.querySelectorAll(".nav-btn").forEach(button => {
+                button.classList.toggle("active", button.dataset.view === viewId);
+            });
+            if (viewId === "rowsView") {
+                loadRows();
+            }
+        }
+
+        function getRowValue(row, keys) {
+            for (const key of keys) {
+                if (row[key] !== undefined && row[key] !== null) return row[key];
+            }
+            return "";
+        }
+
+        function normalizeRow(row, index) {
+            return {
+                rowNumber: getRowValue(row, ["rowNumber", "row", "rowIndex", "id"]) || index + 1,
+                sheetName: getRowValue(row, ["sheetName", "sheet"]),
+                date: getRowValue(row, ["date", "DATE"]),
+                category: getRowValue(row, ["category", "categories", "expenseCategory", "CATEGORIES"]),
+                wallet: getRowValue(row, ["wallet", "takeMoneyFrom", "source", "TAKE MONEY FROM"]),
+                note: getRowValue(row, ["note", "description", "NOTE"]),
+                amount: getRowValue(row, ["amount", "AMOUNT"]),
+                raw: row
+            };
+        }
+
+        function setRowsStatus(message, className = "") {
+            const status = document.getElementById("rowsStatus");
+            status.textContent = message;
+            status.className = className;
+        }
+
+        function renderRows(rows) {
+            const body = document.getElementById("transactionsBody");
+            body.innerHTML = "";
+            const normalizedRows = rows.slice(0, 25).map(normalizeRow);
+            document.getElementById("rowsCount").textContent = `${normalizedRows.length} of 25 rows`;
+
+            normalizedRows.forEach(row => {
+                const tableRow = document.createElement("tr");
+                [row.rowNumber, formatDateCell(row.date), row.category, row.wallet, row.note, formatBalance(row.amount)]
+                    .forEach(value => {
+                        const cell = document.createElement("td");
+                        cell.textContent = value;
+                        tableRow.appendChild(cell);
+                    });
+
+                const actionsCell = document.createElement("td");
+                actionsCell.className = "row-actions";
+                const editButton = document.createElement("button");
+                editButton.className = "edit-row-btn";
+                editButton.textContent = "Edit";
+                editButton.dataset.row = row.rowNumber;
+                editButton.addEventListener("click", () => editRow(row));
+                const deleteButton = document.createElement("button");
+                deleteButton.className = "delete-row-btn";
+                deleteButton.textContent = "Delete";
+                deleteButton.addEventListener("click", () => deleteRow(row.rowNumber, row.sheetName));
+                actionsCell.append(editButton, deleteButton);
+                tableRow.appendChild(actionsCell);
+                body.appendChild(tableRow);
+            });
+        }
+
+        async function requestBackend(action, extra = {}) {
+            const response = await fetch(webAppUrl, {
+                method: "POST",
+                mode: "cors",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({ apiKey, action, ...extra })
+            });
+            const data = await response.json();
+            if (!response.ok || data.error || data.status === "error") {
+                throw new Error(data.error || data.message || `Failed to ${action}.`);
+            }
+            return data;
+        }
+
+        async function loadRows() {
+            setRowsStatus("Loading rows...");
+            try {
+                const data = await requestBackend("getTransactions", { limit: 25 });
+                const rows = Array.isArray(data.rows) ? data.rows
+                    : Array.isArray(data.transactions) ? data.transactions : [];
+                renderRows(rows);
+                setRowsStatus(rows.length ? "" : "No transactions yet.");
+            } catch (error) {
+                setRowsStatus(error.message, "error");
+            }
+        }
+
+        function editRow(row) {
+            editingRow = { rowNumber: row.rowNumber, sheetName: row.sheetName };
+            document.getElementById("transactionDateValue").value = String(row.date).match(/^\d{4}-\d{2}-\d{2}/)?.[0] || "";
+            document.getElementById("transactionDate").value = formatDateCell(row.date);
+            document.getElementById("expenseCategory").value = row.category;
+            document.getElementById("wallet").value = row.wallet;
+            document.getElementById("amount").value = row.amount;
+            document.getElementById("note").value = row.note;
+            document.getElementById("submitBtn").textContent = "Update Transaction";
+            showView("formView");
+        }
+
+        async function deleteRow(rowNumber, sheetName) {
+            if (!confirm(`Delete row ${rowNumber}?`)) return;
+            setRowsStatus("Deleting row...");
+            try {
+                await requestBackend("deleteTransaction", { rowNumber, sheetName });
+                await loadRows();
+            } catch (error) {
+                setRowsStatus(error.message, "error");
+            }
+        }
+
         resetTransactionForm();
 
         // 1. LOAD CATEGORIES AFTER AUTHENTICATION
@@ -552,6 +795,7 @@
 
                 authGate.style.display = "none";
                 app.style.display = "block";
+                document.getElementById("bottomNav").style.display = "flex";
                 saveApiKey();
 
                 // Populate Type Dropdown
@@ -648,6 +892,11 @@
             apiKey = document.getElementById("apiKey").value;
             loadApp();
         });
+
+        document.querySelectorAll(".nav-btn").forEach(button => {
+            button.addEventListener("click", () => showView(button.dataset.view));
+        });
+        document.getElementById("refreshRowsBtn").addEventListener("click", loadRows);
 
         apiKey = getSavedApiKey();
         if (apiKey) {
@@ -789,6 +1038,9 @@
 
             const payload = {
                 apiKey,
+                action: editingRow ? "updateTransaction" : undefined,
+                rowNumber: editingRow?.rowNumber || undefined,
+                sheetName: editingRow?.sheetName || undefined,
                 walletRow: selectedWalletRow,
                 date: document.getElementById("transactionDateValue").value,
                 type: document.getElementById("type").value,
@@ -828,9 +1080,12 @@
                 const result = await response.json();
 
                 if (result.status === "success") {
+                    editingRow = null;
                     showBalance(result.balance, result.dateCell, result.interest);
                     document.getElementById("amount").value = "";
                     document.getElementById("note").value = "";
+                    submitBtn.innerText = "Submit Transaction";
+                    if (document.getElementById("rowsView").classList.contains("active")) loadRows();
                 } else {
                     throw new Error(result.message || "Failed to save data.");
                 }
