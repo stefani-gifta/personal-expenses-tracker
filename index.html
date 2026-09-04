@@ -480,7 +480,7 @@
 
     <script>
         // Replace with your copied Google Apps Script Web App URL
-        const webAppUrl = "https://script.google.com/macros/s/AKfycbyVz4gL_H492LS28iyjxMYiFk5nYatl8IC5Kq3PK2K183IfdQWrYRrQU2w8rbXvt2kq0w/exec";
+        const webAppUrl = "WEB_APP_URL";
         const savedApiKeyStorageKey = "expensesTrackerApiKey";
         let apiKey = "";
         let selectedWalletRow = "";
@@ -512,9 +512,17 @@
         }
 
         function formatBalance(value) {
-            const amount = Number(value);
+            if (value === null || value === undefined || value === "") {
+                return "Balance unavailable";
+            }
+
+            const cleanedValue = String(value)
+                .replace(/[^\d,.-]/g, "")
+                .replace(/[,.]/g, "");
+            const amount = Number(cleanedValue);
+
             return Number.isFinite(amount)
-                ? `Rp${new Intl.NumberFormat("id-ID").format(amount)}`
+                ? new Intl.NumberFormat("en-US").format(amount)
                 : "Balance unavailable";
         }
 
@@ -679,7 +687,7 @@
         function renderRows(rows) {
             const body = document.getElementById("transactionsBody");
             body.innerHTML = "";
-            const normalizedRows = rows.slice(0, 25).map(normalizeRow);
+            const normalizedRows = rows.slice(0, 25).reverse().map(normalizeRow);
             document.getElementById("rowsCount").textContent = `${normalizedRows.length} of 25 rows`;
 
             normalizedRows.forEach(row => {
