@@ -279,12 +279,6 @@
         .app-view { display: none; }
         .app-view.active { display: block; }
 
-        .page-heading {
-            margin: 0 0 24px;
-            font-size: 20px;
-            line-height: 1.35;
-        }
-
         .rows-toolbar {
             display: flex;
             align-items: center;
@@ -399,8 +393,6 @@
     <main id="app">
 
     <section id="formView" class="app-view active">
-    <h1 class="page-heading">New transaction</h1>
-
     <!-- Dynamic Type Selection -->
     <div class="form-group">
         <label for="type">Transaction Type</label>
@@ -469,7 +461,6 @@
     </section>
 
     <section id="rowsView" class="app-view">
-        <h1 class="page-heading">Saved rows</h1>
         <div class="rows-toolbar">
             <p id="rowsCount">0 of 25 rows</p>
             <button type="button" id="refreshRowsBtn" title="Refresh rows">Refresh</button>
