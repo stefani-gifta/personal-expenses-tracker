@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +15,9 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
 
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Space Mono', monospace;
@@ -46,6 +49,7 @@
             from {
                 opacity: 0;
             }
+
             to {
                 opacity: 1;
             }
@@ -57,7 +61,9 @@
             margin: 0 auto;
         }
 
-        .form-group { margin-bottom: 18px; }
+        .form-group {
+            margin-bottom: 18px;
+        }
 
         label {
             display: block;
@@ -70,7 +76,9 @@
             color: #7C5CBF;
         }
 
-        select, input, datalist {
+        select,
+        input,
+        datalist {
             width: 100%;
             padding: 12px;
             margin-top: 2px;
@@ -92,7 +100,8 @@
             padding: 8px 12px;
         }
 
-        select:focus, input:focus {
+        select:focus,
+        input:focus {
             outline: none;
             border-color: #7C5CBF;
             box-shadow: 0 0 0 3px rgba(124, 92, 191, 0.15);
@@ -142,7 +151,9 @@
             transition: background-color 0.15s ease, transform 0.1s ease;
         }
 
-        button:active { transform: scale(0.98); }
+        button:active {
+            transform: scale(0.98);
+        }
 
         button:disabled {
             background-color: #D8D2E6 !important;
@@ -151,12 +162,14 @@
             transform: none;
         }
 
-        #submitBtn, #authButton {
+        #submitBtn,
+        #authButton {
             background-color: #7C5CBF;
             color: #FFFFFF;
         }
 
-        #submitBtn:hover:not(:disabled), #authButton:hover:not(:disabled) {
+        #submitBtn:hover:not(:disabled),
+        #authButton:hover:not(:disabled) {
             background-color: #5B21B6;
         }
 
@@ -185,7 +198,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         #balanceDisplay {
@@ -258,17 +273,27 @@
             font-style: italic;
         }
 
-        #validationStatus.success { color: #2F7D5A; }
-        #validationStatus.error { color: #B0233F; }
+        #validationStatus.success {
+            color: #2F7D5A;
+        }
 
-        .loading-text { color: #9C93B3; font-style: italic; }
+        #validationStatus.error {
+            color: #B0233F;
+        }
+
+        .loading-text {
+            color: #9C93B3;
+            font-style: italic;
+        }
 
         #authGate,
         #app {
             width: 100%;
         }
 
-        #app { display: none; }
+        #app {
+            display: none;
+        }
 
         #authError {
             display: none;
@@ -280,8 +305,13 @@
             font-family: 'Space Mono', monospace;
         }
 
-        .app-view { display: none; }
-        .app-view.active { display: block; }
+        .app-view {
+            display: none;
+        }
+
+        .app-view.active {
+            display: block;
+        }
 
         .rows-toolbar {
             display: flex;
@@ -291,7 +321,11 @@
             margin-bottom: 14px;
         }
 
-        .rows-toolbar p { margin: 0; color: #7C5CBF; font-size: 11px; }
+        .rows-toolbar p {
+            margin: 0;
+            color: #7C5CBF;
+            font-size: 11px;
+        }
 
         #refreshRowsBtn {
             width: auto;
@@ -302,7 +336,11 @@
             border: 1.5px solid #E4DBF5;
         }
 
-        .table-wrapper { overflow-x: hidden; margin: 0 -8px; padding: 0 8px 8px; }
+        .table-wrapper {
+            overflow-x: hidden;
+            margin: 0 -8px;
+            padding: 0 8px 8px;
+        }
 
         #transactionsTable {
             width: 100%;
@@ -313,19 +351,39 @@
         }
 
         #transactionsTable th:nth-child(1),
-        #transactionsTable td:nth-child(1) { width: 8%; }
+        #transactionsTable td:nth-child(1) {
+            width: 8%;
+        }
+
         #transactionsTable th:nth-child(2),
-        #transactionsTable td:nth-child(2) { width: 13%; }
+        #transactionsTable td:nth-child(2) {
+            width: 13%;
+        }
+
         #transactionsTable th:nth-child(3),
-        #transactionsTable td:nth-child(3) { width: 15%; }
+        #transactionsTable td:nth-child(3) {
+            width: 15%;
+        }
+
         #transactionsTable th:nth-child(4),
-        #transactionsTable td:nth-child(4) { width: 17%; }
+        #transactionsTable td:nth-child(4) {
+            width: 17%;
+        }
+
         #transactionsTable th:nth-child(5),
-        #transactionsTable td:nth-child(5) { width: 15%; }
+        #transactionsTable td:nth-child(5) {
+            width: 15%;
+        }
+
         #transactionsTable th:nth-child(6),
-        #transactionsTable td:nth-child(6) { width: 12%; }
+        #transactionsTable td:nth-child(6) {
+            width: 12%;
+        }
+
         #transactionsTable th:nth-child(7),
-        #transactionsTable td:nth-child(7) { width: auto; }
+        #transactionsTable td:nth-child(7) {
+            width: auto;
+        }
 
         #transactionsTable th,
         #transactionsTable td {
@@ -338,17 +396,27 @@
             font-size: 8px;
             text-align: left;
             letter-spacing: 0.04em;
-            border-bottom: 1.5px solid #E4DBF5;
         }
 
         #transactionsTable td {
             padding: 9px 4px;
             vertical-align: top;
+        }
+
+        #transactionsTable tbody tr {
             border-bottom: 1px solid #E4DBF5;
         }
 
-        #transactionsTable tbody tr:hover { background: #f4f2f7; }
-        .row-actions { display: flex; flex-direction: row; gap: 4px; }
+        #transactionsTable tbody tr:hover {
+            background: #f4f2f7;
+        }
+
+        .row-actions {
+            display: flex;
+            flex-direction: row;
+            gap: 4px;
+        }
+
         .row-actions button {
             flex: 1 1 0;
             width: auto;
@@ -356,14 +424,34 @@
             padding: 5px 2px;
             font-size: 8px;
         }
-        .edit-row-btn { color: #2F7D5A; background: #e8f3ed; }
-        .delete-row-btn { color: #B0233F; background: #fbecef; }
+
+        .edit-row-btn {
+            color: #2F7D5A;
+            background: #e8f3ed;
+        }
+
+        .delete-row-btn {
+            color: #B0233F;
+            background: #fbecef;
+        }
 
         @media (max-width: 480px) {
-            .row-actions { flex-direction: column; }
-            .row-actions button { width: 100%; }
+            .row-actions {
+                flex-direction: column;
+            }
+
+            .row-actions button {
+                width: 100%;
+            }
         }
-        #rowsStatus { min-height: 18px; margin: 12px 0 0; color: #9C93B3; font-size: 11px; font-style: italic; }
+
+        #rowsStatus {
+            min-height: 18px;
+            margin: 12px 0 0;
+            color: #9C93B3;
+            font-size: 11px;
+            font-style: italic;
+        }
 
         #bottomNav {
             position: fixed;
@@ -379,14 +467,29 @@
             border-top: 1px solid #E4DBF5;
         }
 
-        .nav-btn { width: auto; min-width: 110px; margin: 0; padding: 10px 18px; color: #9C93B3; background: transparent; }
-        .nav-btn.active { color: #FFFFFF; background: #7C5CBF; }
+        .nav-btn {
+            width: auto;
+            min-width: 110px;
+            margin: 0;
+            padding: 10px 18px;
+            color: #9C93B3;
+            background: transparent;
+        }
+
+        .nav-btn.active {
+            color: #FFFFFF;
+            background: #7C5CBF;
+        }
 
         @media (min-width: 481px) {
-            #bottomNav { left: calc(50% - 200px); right: calc(50% - 200px); }
+            #bottomNav {
+                left: calc(50% - 200px);
+                right: calc(50% - 200px);
+            }
         }
     </style>
 </head>
+
 <body>
 
     <section id="authGate">
@@ -402,97 +505,95 @@
 
     <main id="app">
 
-    <section id="formView" class="app-view active">
-    <!-- Dynamic Type Selection -->
-    <div class="form-group">
-        <label for="type">Transaction Type</label>
-        <select id="type">
-            <option class="loading-text">Loading types...</option>
-        </select>
-    </div>
+        <section id="formView" class="app-view active">
+            <!-- Dynamic Type Selection -->
+            <div class="form-group">
+                <label for="type">Transaction Type</label>
+                <select id="type">
+                    <option class="loading-text">Loading types...</option>
+                </select>
+            </div>
 
-    <!-- Transaction Date -->
-    <div class="form-group">
-        <label for="transactionDate">Date</label>
-        <div class="date-input-wrapper">
-            <input type="text" id="transactionDate" placeholder="dd MMM yyyy" autocomplete="off" readonly required>
-            <input type="date" id="transactionDateValue" aria-label="Choose transaction date">
-        </div>
-    </div>
+            <!-- Transaction Date -->
+            <div class="form-group">
+                <label for="transactionDate">Date</label>
+                <div class="date-input-wrapper">
+                    <input type="text" id="transactionDate" placeholder="dd MMM yyyy" autocomplete="off" readonly
+                        required>
+                    <input type="date" id="transactionDateValue" aria-label="Choose transaction date">
+                </div>
+            </div>
 
-    <!-- Dynamic Expense Category Selection -->
-    <div class="form-group">
-        <label for="expenseCategory">Category</label>
-        <input type="text" id="expenseCategory" list="categoryList" placeholder="Type or select...">
-        <datalist id="categoryList"></datalist>
-    </div>
+            <!-- Dynamic Expense Category Selection -->
+            <div class="form-group">
+                <label for="expenseCategory">Category</label>
+                <input type="text" id="expenseCategory" list="categoryList" placeholder="Type or select...">
+                <datalist id="categoryList"></datalist>
+            </div>
 
-    <!-- Dynamic Wallet Selection -->
-    <div class="form-group">
-        <label for="wallet">Wallet Source / Destination</label>
-        <input type="text" id="wallet" list="walletList" placeholder="Type or select...">
-        <datalist id="walletList"></datalist>
-    </div>
+            <!-- Dynamic Wallet Selection -->
+            <div class="form-group">
+                <label for="wallet">Wallet Source / Destination</label>
+                <input type="text" id="wallet" list="walletList" placeholder="Type or select...">
+                <datalist id="walletList"></datalist>
+            </div>
 
-    <!-- Balance Validation -->
-    <section id="balanceValidation">
-        <div id="balanceDisplay">
-            Current Balance: Fetching...
-            <span id="lastCheckDisplay"></span>
-        </div>
-        <div id="interestGroup" class="form-group">
-            <label for="interest">Interest Formula</label>
-            <input type="text" id="interest" placeholder="Enter formula..." autocomplete="off">
-        </div>
-        <div class="validation-actions">
-            <button type="button" id="confirmBalanceBtn" onclick="validateBalance()">Update last check</button>
-        </div>
-        <p id="validationStatus" role="status"></p>
-    </section>
+            <!-- Balance Validation -->
+            <section id="balanceValidation">
+                <div id="balanceDisplay">
+                    Current Balance: Fetching...
+                    <span id="lastCheckDisplay"></span>
+                </div>
+                <div id="interestGroup" class="form-group">
+                    <label for="interest">Interest Formula</label>
+                    <input type="text" id="interest" placeholder="Enter formula..." autocomplete="off">
+                </div>
+                <div class="validation-actions">
+                    <button type="button" id="confirmBalanceBtn" onclick="validateBalance()">Update last check</button>
+                </div>
+                <p id="validationStatus" role="status"></p>
+            </section>
 
-    <!-- Amount -->
-    <div class="form-group">
-        <label for="amount">Amount</label>
-        <input type="text" id="amount" placeholder="Rp0" min="0" step="100000" required>
-    </div>
+            <!-- Amount -->
+            <div class="form-group">
+                <label for="amount">Amount</label>
+                <input type="text" id="amount" placeholder="Rp0" min="0" step="100000" required>
+            </div>
 
-    <!-- Note (Description) -->
-    <div class="form-group">
-        <label for="note">Note</label>
-        <input
-            type="text"
-            id="note"
-            placeholder="" required>
-    </div>
+            <!-- Note (Description) -->
+            <div class="form-group">
+                <label for="note">Note</label>
+                <input type="text" id="note" placeholder="" required>
+            </div>
 
-    <!-- Submit Button -->
-    <button id="submitBtn" onclick="sendTransaction()" disabled>Loading Sheet Configuration...</button>
-    <button type="button" id="resetBtn" onclick="resetTransactionForm()">Reset</button>
-    </section>
+            <!-- Submit Button -->
+            <button id="submitBtn" onclick="sendTransaction()" disabled>Loading Sheet Configuration...</button>
+            <button type="button" id="resetBtn" onclick="resetTransactionForm()">Reset</button>
+        </section>
 
-    <section id="rowsView" class="app-view">
-        <div class="rows-toolbar">
-            <p id="rowsCount">0 of 25 rows</p>
-            <button type="button" id="refreshRowsBtn" title="Refresh rows">Refresh</button>
-        </div>
-        <div class="table-wrapper">
-            <table id="transactionsTable">
-                <thead>
-                    <tr>
-                        <th>ROW</th>
-                        <th>DATE</th>
-                        <th>CATEGORIES</th>
-                        <th>TAKE MONEY FROM</th>
-                        <th>NOTE</th>
-                        <th>AMOUNT</th>
-                        <th>ACTIONS</th>
-                    </tr>
-                </thead>
-                <tbody id="transactionsBody"></tbody>
-            </table>
-        </div>
-        <p id="rowsStatus" role="status"></p>
-    </section>
+        <section id="rowsView" class="app-view">
+            <div class="rows-toolbar">
+                <p id="rowsCount">0 of 25 rows</p>
+                <button type="button" id="refreshRowsBtn" title="Refresh rows">Refresh</button>
+            </div>
+            <div class="table-wrapper">
+                <table id="transactionsTable">
+                    <thead>
+                        <tr>
+                            <th>ROW</th>
+                            <th>DATE</th>
+                            <th>CATEGORIES</th>
+                            <th>TAKE MONEY FROM</th>
+                            <th>NOTE</th>
+                            <th>AMOUNT</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionsBody"></tbody>
+                </table>
+            </div>
+            <p id="rowsStatus" role="status"></p>
+        </section>
     </main>
 
     <nav id="bottomNav" aria-label="Main navigation">
@@ -809,7 +910,7 @@
                     })
                 });
                 const data = await response.json();
-                
+
                 if (!response.ok || data.error || data.status === "error") {
                     throw new Error(data.error || data.message || "Authentication failed.");
                 }
@@ -840,11 +941,11 @@
                         categoryGroup.style.display = "none";
                     } else {
                         categoryGroup.style.display = "block";
-                                
+
                         // Populate Expense Category Datalist
                         const categoryList = document.getElementById("categoryList");
                         categoryList.innerHTML = "";
-                        
+
                         // Add blank option
                         const blankOption = document.createElement("option");
                         blankOption.value = "";
@@ -866,13 +967,13 @@
                 // Populate Wallet Datalist
                 const walletList = document.getElementById("walletList");
                 walletList.innerHTML = "";
-                
+
                 // Add blank option
                 const blankWalletOption = document.createElement("option");
                 blankWalletOption.value = "";
                 blankWalletOption.text = "Unselected";
                 walletList.appendChild(blankWalletOption);
-                
+
                 data.wallets.forEach((wallet, index) => {
                     const walletName = typeof wallet === "object"
                         ? (wallet.name || wallet.wallet || wallet.value)
@@ -895,7 +996,7 @@
                 walletInput.addEventListener("change", updateWalletBalance);
 
                 showBalance(null);
-                
+
                 // Enable Submit Button
                 const submitBtn = document.getElementById("submitBtn");
                 submitBtn.innerText = "Submit Transaction";
@@ -914,7 +1015,7 @@
             }
         }
 
-        document.getElementById("authForm").addEventListener("submit", function(event) {
+        document.getElementById("authForm").addEventListener("submit", function (event) {
             event.preventDefault();
             apiKey = document.getElementById("apiKey").value;
             loadApp();
@@ -931,11 +1032,11 @@
             loadApp();
         }
 
-        document.getElementById("transactionDateValue").addEventListener("change", function(event) {
+        document.getElementById("transactionDateValue").addEventListener("change", function (event) {
             setTransactionDate(event.target.value);
         });
 
-        document.getElementById("transactionDate").addEventListener("click", function() {
+        document.getElementById("transactionDate").addEventListener("click", function () {
             const datePicker = document.getElementById("transactionDateValue");
             if (typeof datePicker.showPicker === "function") {
                 datePicker.showPicker();
@@ -944,7 +1045,7 @@
             }
         });
 
-        document.getElementById("amount").addEventListener("keydown", function(event) {
+        document.getElementById("amount").addEventListener("keydown", function (event) {
             if (event.key === "Enter" || event.key === "ArrowDown") {
                 event.preventDefault();
                 document.getElementById("note").focus();
@@ -953,7 +1054,7 @@
         });
 
         // Add Enter key support for transaction submission
-        document.getElementById("note").addEventListener("keypress", function(event) {
+        document.getElementById("note").addEventListener("keypress", function (event) {
             if (event.key === "Enter") {
                 event.preventDefault();
                 sendTransaction();
@@ -961,7 +1062,7 @@
         });
 
         document.getElementById("interest").addEventListener("change", updateInterestFormula);
-        document.getElementById("interest").addEventListener("keypress", function(event) {
+        document.getElementById("interest").addEventListener("keypress", function (event) {
             if (event.key === "Enter") {
                 event.preventDefault();
                 updateInterestFormula();
@@ -1103,7 +1204,7 @@
                     headers: { "Content-Type": "text/plain;charset=utf-8" },
                     body: JSON.stringify(payload)
                 });
-                
+
                 const result = await response.json();
 
                 if (result.status === "success") {
@@ -1125,4 +1226,5 @@
         }
     </script>
 </body>
+
 </html>
