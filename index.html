@@ -51,6 +51,7 @@
             }
         }
 
+        #authGate,
         #formView {
             max-width: 400px !important;
             margin: 0 auto;
@@ -347,15 +348,21 @@
         }
 
         #transactionsTable tbody tr:hover { background: #f4f2f7; }
-        .row-actions { display: flex; flex-direction: column; gap: 4px; }
+        .row-actions { display: flex; flex-direction: row; gap: 4px; }
         .row-actions button {
-            width: 100%;
+            flex: 1 1 0;
+            width: auto;
             margin: 0;
             padding: 5px 2px;
             font-size: 8px;
         }
         .edit-row-btn { color: #2F7D5A; background: #e8f3ed; }
         .delete-row-btn { color: #B0233F; background: #fbecef; }
+
+        @media (max-width: 480px) {
+            .row-actions { flex-direction: column; }
+            .row-actions button { width: 100%; }
+        }
         #rowsStatus { min-height: 18px; margin: 12px 0 0; color: #9C93B3; font-size: 11px; font-style: italic; }
 
         #bottomNav {
@@ -565,11 +572,8 @@
             setTransactionDate(getToday());
             document.getElementById("amount").value = "";
             document.getElementById("note").value = "";
-            document.getElementById("interest").value = "";
             const submitButton = document.getElementById("submitBtn");
             if (submitButton && !submitButton.disabled) submitButton.innerText = "Submit Transaction";
-            document.getElementById("balanceDisplay").style.display = "none";
-            document.getElementById("balanceValidation").style.display = "none";
             setValidationStatus("");
         }
 
