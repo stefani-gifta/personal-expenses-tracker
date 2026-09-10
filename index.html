@@ -725,6 +725,18 @@
             return isoDate ? formatDateForDisplay(isoDate[0]) : dateText;
         }
 
+        function formatIsoDate(value) {
+            const dateText = String(value).trim();
+            
+            const dateParts = dateText.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+            if (!dateParts) {
+                return dateText;
+            }
+            const [, month, day, year] = dateParts;
+            
+            return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+        }
+
         function getSelectedWalletRow() {
             const walletInput = document.getElementById("wallet");
             const walletOption = document.querySelector(
@@ -879,7 +891,7 @@
         function editRow(row) {
             editingRow = { rowNumber: row.rowNumber, sheetName: row.sheetName };
             document.getElementById("transactionDateValue").value = String(row.date).match(/^\d{4}-\d{2}-\d{2}/)?.[0] || "";
-            document.getElementById("transactionDate").value = setTransactionDate(formatDateCell(row.date));
+            document.getElementById("transactionDate").value = setTransactionDate(formatIsoDate(row.date));
             document.getElementById("expenseCategory").value = row.category;
             document.getElementById("wallet").value = row.wallet;
             document.getElementById("amount").value = reverseFormatBalance(row.amount);
