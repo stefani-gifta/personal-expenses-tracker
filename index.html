@@ -879,7 +879,7 @@
         function editRow(row) {
             editingRow = { rowNumber: row.rowNumber, sheetName: row.sheetName };
             document.getElementById("transactionDateValue").value = String(row.date).match(/^\d{4}-\d{2}-\d{2}/)?.[0] || "";
-            document.getElementById("transactionDate").value = formatDateForDisplay(row.date);
+            document.getElementById("transactionDate").value = setTransactionDate(row.date);
             document.getElementById("expenseCategory").value = row.category;
             document.getElementById("wallet").value = row.wallet;
             document.getElementById("amount").value = reverseFormatBalance(row.amount);
