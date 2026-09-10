@@ -727,13 +727,18 @@
 
         function formatIsoDate(value) {
             const dateText = String(value).trim();
-            
+
+            const isoDate = dateText.match(/^(\d{4}-\d{2}-\d{2})/);
+            if (isoDate) {
+                return isoDate[1];
+            }
+
             const dateParts = dateText.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
             if (!dateParts) {
                 return dateText;
             }
             const [, month, day, year] = dateParts;
-            
+
             return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
         }
 
