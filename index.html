@@ -336,6 +336,27 @@
             border: 1.5px solid #E4DBF5;
         }
 
+        .rows-type-toggle {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 14px;
+        }
+
+        .rows-type-btn {
+            flex: 1;
+            margin: 0;
+            padding: 9px 8px;
+            color: #7C5CBF;
+            background: #f4f2f7;
+            border: 1.5px solid #E4DBF5;
+        }
+
+        .rows-type-btn.active {
+            color: #FFFFFF;
+            background: #7C5CBF;
+            border-color: #7C5CBF;
+        }
+
         .table-wrapper {
             overflow-x: hidden;
             margin: 0 -8px;
@@ -579,6 +600,12 @@
         </section>
 
         <section id="rowsView" class="app-view">
+            <div class="rows-type-toggle" role="tablist" aria-label="Transaction type">
+                <button type="button" class="rows-type-btn active" data-rows-type="Expenses" role="tab"
+                    aria-selected="true">Expenses</button>
+                <button type="button" class="rows-type-btn" data-rows-type="Allowances" role="tab"
+                    aria-selected="false">Allowances</button>
+            </div>
             <div class="rows-toolbar">
                 <p id="rowsCount">0 of 25 rows</p>
                 <button type="button" id="refreshRowsBtn" title="Refresh rows">Refresh</button>
@@ -616,6 +643,7 @@
         let selectedWalletRow = "";
         let balanceRequestId = 0;
         let editingRow = null;
+        let selectedRowsType = "Expenses";
 
         function getSavedApiKey() {
             try {
@@ -810,6 +838,15 @@
             return {
                 rowNumber: getRowValue(row, ["rowNumber", "row", "rowIndex", "id"]) || index + 1,
                 sheetName: getRowValue(row, ["sheetName", "sheet"]),
+                type: getRowValue(row, [
+                    "type",
+                    "transactionType",
+                    "TYPE",
+                    "TRANSACTION TYPE",
+                    "TYPE OF TRANSACTION"
+                ]) || (["Expenses", "Allowances"].includes(getRowValue(row, ["sheetName", "sheet"]))
+                    ? getRowValue(row, ["sheetName", "sheet"])
+                    : ""),
                 date: getRowValue(row, ["date", "DATE"]),
                 category: getRowValue(row, ["category", "categories", "expenseCategory", "CATEGORIES"]),
                 wallet: getRowValue(row, ["wallet", "takeMoneyFrom", "source", "TAKE MONEY FROM"]),
@@ -828,10 +865,16 @@
         function renderRows(rows) {
             const body = document.getElementById("transactionsBody");
             body.innerHTML = "";
-            const normalizedRows = rows.slice(0, 25).reverse().map(normalizeRow);
-            document.getElementById("rowsCount").textContent = `${normalizedRows.length} of 25 rows`;
+            const normalizedRows = rows.map(normalizeRow);
+            const rowsForType = normalizedRows.some(row => row.type)
+                ? normalizedRows.filter(row => row.type === selectedRowsType)
+                : normalizedRows;
+            const visibleRows = rowsForType
+                .slice(0, 25)
+                .reverse();
+            document.getElementById("rowsCount").textContent = `${visibleRows.length} of 25 rows`;
 
-            normalizedRows.forEach(row => {
+            visibleRows.forEach(row => {
                 const tableRow = document.createElement("tr");
                 [row.rowNumber, formatDateCell(row.date), row.category, row.wallet, row.note, formatBalance(row.amount)]
                     .forEach(value => {
@@ -874,11 +917,16 @@
         async function loadRows() {
             setRowsStatus("Loading rows...");
             try {
-                const data = await requestBackend("getTransactions", { limit: 25 });
+                const data = await requestBackend("getTransactions", {
+                    limit: 25,
+                    type: selectedRowsType
+                });
                 const rows = Array.isArray(data.rows) ? data.rows
                     : Array.isArray(data.transactions) ? data.transactions : [];
                 renderRows(rows);
-                setRowsStatus(rows.length ? "" : "No transactions yet.");
+                setRowsStatus(document.getElementById("transactionsBody").children.length
+                    ? ""
+                    : `No ${selectedRowsType.toLowerCase()} yet.`);
             } catch (error) {
                 setRowsStatus(error.message, "error");
             }
@@ -1044,6 +1092,17 @@
 
         document.querySelectorAll(".nav-btn").forEach(button => {
             button.addEventListener("click", () => showView(button.dataset.view));
+        });
+        document.querySelectorAll(".rows-type-btn").forEach(button => {
+            button.addEventListener("click", () => {
+                selectedRowsType = button.dataset.rowsType;
+                document.querySelectorAll(".rows-type-btn").forEach(typeButton => {
+                    const isActive = typeButton === button;
+                    typeButton.classList.toggle("active", isActive);
+                    typeButton.setAttribute("aria-selected", String(isActive));
+                });
+                loadRows();
+            });
         });
         document.getElementById("refreshRowsBtn").addEventListener("click", loadRows);
 
