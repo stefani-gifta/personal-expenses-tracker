@@ -669,10 +669,44 @@
             }
         }
 
+        function parseBalance(value) {
+            if (value === null || value === undefined || value === "") {
+                return NaN;
+            }
+            if (typeof value === "number") {
+                return value;
+            }
+
+            let cleanedValue = String(value).trim().replace(/[^\d,.-]/g, "");
+            if (!cleanedValue) {
+                return NaN;
+            }
+
+            const isNegative = cleanedValue.startsWith("-");
+            cleanedValue = cleanedValue.replace(/-/g, "");
+            const lastComma = cleanedValue.lastIndexOf(",");
+            const lastDot = cleanedValue.lastIndexOf(".");
+
+            if (lastComma !== -1 && lastDot !== -1) {
+                const decimalIndex = Math.max(lastComma, lastDot);
+                cleanedValue = `${cleanedValue.slice(0, decimalIndex).replace(/[,.]/g, "")}.${cleanedValue.slice(decimalIndex + 1).replace(/[,.]/g, "")}`;
+            } else if (lastComma !== -1) {
+                cleanedValue = lastComma === cleanedValue.length - 4
+                    ? cleanedValue.replace(/,/g, "")
+                    : cleanedValue.replace(",", ".").replace(/,/g, "");
+            } else if (lastDot !== -1 && lastDot === cleanedValue.length - 4) {
+                cleanedValue = cleanedValue.replace(/\./g, "");
+            }
+
+            const amount = Number(cleanedValue);
+            return isNegative ? -amount : amount;
+        }
+
         function formatBalance(value) {
-            return value === null || value === undefined || value === ""
-                ? "Balance unavailable"
-                : String(value);
+            const amount = parseBalance(value);
+            return Number.isFinite(amount)
+                ? new Intl.NumberFormat("en-US").format(amount)
+                : "Balance unavailable";
         }
 
         function reverseFormatBalance(value) {
