@@ -642,18 +642,9 @@
         }
 
         function formatBalance(value) {
-            if (value === null || value === undefined || value === "") {
-                return "Balance unavailable";
-            }
-
-            const cleanedValue = String(value)
-                .replace(/[^\d,.-]/g, "")
-                .replace(/[,.]/g, "");
-            const amount = Number(cleanedValue);
-
-            return Number.isFinite(amount)
-                ? new Intl.NumberFormat("en-US").format(amount)
-                : "Balance unavailable";
+            return value === null || value === undefined || value === ""
+                ? "Balance unavailable"
+                : String(value);
         }
 
         function reverseFormatBalance(value) {
@@ -709,7 +700,7 @@
                 ? `Last checked: ${formatDateCell(dateCell)}`
                 : "Last checked: Not available";
             interestInput.value = interest ?? "";
-            const hasBalance = Number.isFinite(Number(balance));
+            const hasBalance = balance !== null && balance !== undefined && balance !== "";
             balanceDisplay.style.display = hasBalance ? "block" : "none";
             balanceValidation.style.display = hasBalance ? "block" : "none";
             setValidationStatus("");
@@ -1239,7 +1230,10 @@
 
                 if (result.status === "success") {
                     editingRow = null;
-                    showBalance(result.balance, result.dateCell, result.interest);
+                    if (Object.prototype.hasOwnProperty.call(result, "balance") &&
+                        result.balance !== null && result.balance !== undefined && result.balance !== "") {
+                        showBalance(result.balance, result.dateCell, result.interest);
+                    }
                     document.getElementById("amount").value = "";
                     document.getElementById("note").value = "";
                     submitBtn.innerText = "Submit Transaction";
