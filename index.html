@@ -1325,10 +1325,7 @@
 
                 if (result.status === "success") {
                     editingRow = null;
-                    if (Object.prototype.hasOwnProperty.call(result, "balance") &&
-                        result.balance !== null && result.balance !== undefined && result.balance !== "") {
-                        showBalance(result.balance, result.dateCell, result.interest);
-                    }
+                    await loadWalletBalance(getSelectedWalletRow());
                     document.getElementById("amount").value = "";
                     document.getElementById("note").value = "";
                     submitBtn.innerText = "Submit Transaction";
