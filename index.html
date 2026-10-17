@@ -1158,17 +1158,20 @@
             }
         });
 
-        document.getElementById("amount").addEventListener("keydown", function (event) {
-            if (event.key === "Enter" || event.key === "ArrowDown") {
-                event.preventDefault();
-                document.getElementById("note").focus();
-                document.getElementById("note").select();
-            }
-        });
+        document.getElementById("formView").addEventListener("keydown", function (event) {
+            const fields = Array.from(this.querySelectorAll("input, select, textarea"))
+                .filter(field => field.id !== "transactionDateValue" &&
+                    !field.disabled && field.getClientRects().length > 0);
+            const currentIndex = fields.indexOf(event.target);
+            if (currentIndex === -1) return;
 
-        // Add Enter key support for transaction submission
-        document.getElementById("note").addEventListener("keypress", function (event) {
-            if (event.key === "Enter") {
+            if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+                const nextIndex = currentIndex + (event.key === "ArrowDown" ? 1 : -1);
+                if (fields[nextIndex]) {
+                    event.preventDefault();
+                    fields[nextIndex].focus();
+                }
+            } else if (event.key === "Enter" && currentIndex === fields.length - 1) {
                 event.preventDefault();
                 sendTransaction();
             }
